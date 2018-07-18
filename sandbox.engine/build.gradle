@@ -1,0 +1,8 @@
+apply plugin: 'java'
+
+version = '0.0.1'
+
+jar {
+    baseName = 'SandBox-Engine'
+    version =  version
+}

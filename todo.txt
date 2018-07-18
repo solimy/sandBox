@@ -1,0 +1,5 @@
+-add more animations
+-handle inventory and equipment
+-add more AI
+-optimize
+-gestion UI menus (javafx scene nodes)

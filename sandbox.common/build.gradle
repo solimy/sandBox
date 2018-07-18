@@ -1,0 +1,15 @@
+apply plugin: 'java'
+
+version = '0.0.1'
+
+dependencies {
+	compile project(':sandbox.engine')
+}
+
+jar {
+    baseName = 'SandBox-Common'
+    version =  version
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

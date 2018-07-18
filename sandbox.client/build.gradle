@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'sandbox.client.ClientScript'
+version = '0.0.2'
+
+
+dependencies {
+	compile project(':sandbox.engine')
+	compile project(':sandbox.common')
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs "src/main/java", "src/main/resources"
+        }
+    }
+}
+
+jar {
+    baseName = 'SandBox-Client'
+    version =  version
+	manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
