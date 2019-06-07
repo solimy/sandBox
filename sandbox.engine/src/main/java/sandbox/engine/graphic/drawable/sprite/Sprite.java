@@ -1,74 +1,75 @@
 package sandbox.engine.graphic.drawable.sprite;
 
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Sprite {
-	public static final Sprite empty = new Sprite(new WritableImage(1, 1));
+	public static final Sprite empty = new Sprite(new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY));
 
-	private final Image original;
-	private final Integer originalWidth;
-	private final Integer originalHeight;
-	private double xOrigin = 0D;
-	private double yOrigin = 0D;
-	private double x = 0D;
-	private double y = 0D;
-	private Double xScale = null;
-	private Double yScale = null;
-	private Integer fitWidth = null;
-	private Integer fitHeight = null;
-
+	private final Image originalImage;
+	private final AtomicReference<Image> scaledImageRef = new AtomicReference<Image>(null);
+	private int xOrigin = 0;
+	private int yOrigin = 0;
+	private int x = 0;
+	private int y = 0;
+	private int fitWidth = 0;
+	private int fitHeight = 0;
+	private int xScale = 100;
+	private int yScale = 100;
+	
 	public Sprite(Image image) {
-		original = image;
-		originalWidth = (int) image.getWidth();
-		originalHeight = (int) image.getHeight();
-		fitWidth = originalWidth;
-		fitHeight = originalHeight;
+		originalImage = image;
+		reset();
 	}
 
 	public Sprite reset() {
-		xScale = 100.0;
-		yScale = 100.0;
-		fitHeight = originalHeight;
-		fitWidth = originalWidth;
-		xOrigin = 0.0;
-		yOrigin = 0.0;
+		xOrigin = 0;
+		yOrigin = 0;
+		scale(100, 100);
 		return this;
 	}
 
-	public Sprite setScale(Double xScale, Double yScale) {
+	public Sprite scale(int xScale, int yScale) {
+		if (this.xScale == xScale && this.yScale == yScale)
+			return this;
 		this.xScale = xScale;
 		this.yScale = yScale;
-		fitWidth = (int) (originalWidth * xScale);
-		fitHeight = (int) (originalHeight * yScale);
+		fit(
+			originalImage.getWidth(null) * xScale,
+			originalImage.getHeight(null) * yScale
+		);
 		return this;
 	}
 
-	public Sprite setFit(Integer fitWidth, Integer fitHeight) {
+	public Sprite fit(Integer fitWidth, Integer fitHeight) {
+		if (this.fitWidth == fitWidth && this.fitHeight == fitHeight)
+			return this;
 		this.fitHeight = fitHeight;
 		this.fitWidth = fitWidth;
+		scaledImageRef.set(
+				originalImage.getScaledInstance(
+						this.fitWidth,
+						this.fitHeight,
+						Image.SCALE_SMOOTH)
+		);
 		return this;
 	}
 
-	public Sprite setOrigin(double x, double y) {
+	public Sprite setOrigin(int x, int y) {
 		xOrigin = x;
 		yOrigin = y;
 		return this;
 	}
 
-	public Sprite setXY(double x, double y) {
+	public Sprite setXY(int x, int y) {
 		this.x = x;
 		this.y = y;
 		return this;
 	}
 
-	public void render(GraphicsContext context) {
-		context.drawImage(original, x+xOrigin, y+yOrigin, fitWidth, fitHeight);
-	}
-
-	public Image getOriginal() {
-		return original;
+	public void render(Graphics2D context) {
+		context.drawImage(originalImage, x+xOrigin, y+yOrigin, null);
 	}
 }
