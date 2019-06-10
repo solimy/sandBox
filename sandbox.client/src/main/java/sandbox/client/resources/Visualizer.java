@@ -5,13 +5,12 @@ import java.util.Arrays;
 
 import sandbox.engine.game.Script;
 import sandbox.engine.graphic.GraphicApplication;
-import sandbox.engine.graphic.MainScript;
 import sandbox.engine.graphic.drawable.animation.Animation;
 import sandbox.engine.math.Vector2D;
 
-class Visualizer implements MainScript<Visualizer> {
+class Visualizer {
 
-	enum Render implements Script<GraphicApplication<Visualizer>> {
+	enum Render implements Script<Void> {
 		INSTANCE;
 
 		Vector2D spritePos = new Vector2D(15, 10);
@@ -19,23 +18,20 @@ class Visualizer implements MainScript<Visualizer> {
 				Arrays.asList(Ressources.INSTANCE.FILE_terrain_atlas.extractSprite(15 * 32, 21 * 32, 32, 64)));
 
 		@Override
-		public void execute(GraphicApplication<Visualizer> context) {
-			context.render(animaion.getFrame(0L).reset().fit(100, 100));
-			context.render(animaion.getFrame(0L).reset().setOrigin(16,32));
+		public void execute(Void unused) {
+			GraphicApplication.INSTANCE.render(animaion.getFrame(0L).reset().fit(100, 100));
+			GraphicApplication.INSTANCE.render(animaion.getFrame(0L).reset().setOrigin(16,32));
 		}
 	}
 
-	@Override
-	public void execute(GraphicApplication<Visualizer> context) {
-		context.setFramesPerSecond(10L);
-		context.setOnResizeScript((Script<GraphicApplication<Visualizer>>) Script.EMPTY);
-		context.setOnRenderScript(Render.INSTANCE);
-	}
 
 	public static void main(String[] args) {
-		var gA = new GraphicApplication<Visualizer>(new Visualizer());
+		GraphicApplication.INSTANCE.init();
+		GraphicApplication.INSTANCE.setFramesPerSecond(10L);
+		GraphicApplication.INSTANCE.setOnResizeScript(Script.EMPTY);
+		GraphicApplication.INSTANCE.setOnRenderScript(Render.INSTANCE);
 		try {
-			gA.start();
+			GraphicApplication.INSTANCE.start();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

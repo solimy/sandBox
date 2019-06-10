@@ -2,6 +2,7 @@ package sandbox.client.resources;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -43,13 +44,13 @@ public enum Ressources {
 	}
 
 	private Ressources() {
-		FILE_notFound = new SpriteSheet("/assets/notFound.png");		
-		FILE_terrain_atlas = new SpriteSheet("/assets/terrain_atlas.png");
-		FILE_obj_misk_atlas = new SpriteSheet("/assets/obj_misk_atlas.png");
-		FILE_skeleton = new SpriteSheet("/assets/skeleton.png");
-		FILE_fireball = new SpriteSheet("/assets/fireball_0.png");
-		FILE_explosion = new SpriteSheet("/assets/exp2_0.png");
-		FILE_aks = new SpriteSheet("/assets/aks_assets.png");
+		FILE_notFound = new SpriteSheet(Ressources.class, "/assets/notFound.png");		
+		FILE_terrain_atlas = new SpriteSheet(Ressources.class, "/assets/terrain_atlas.png");
+		FILE_obj_misk_atlas = new SpriteSheet(Ressources.class, "/assets/obj_misk_atlas.png");
+		FILE_skeleton = new SpriteSheet(Ressources.class, "/assets/skeleton.png");
+		FILE_fireball = new SpriteSheet(Ressources.class, "/assets/fireball_0.png");
+		FILE_explosion = new SpriteSheet(Ressources.class, "/assets/exp2_0.png");
+		FILE_aks = new SpriteSheet(Ressources.class, "/assets/aks_assets.png");
 		
 		SPRITE_NOT_FOUND = FILE_explosion.extractSprite();
 		SPRITE_TERRAIN_GRASS = FILE_terrain_atlas.extractSprite(32 * 22, 32 * 5, 32, 32);

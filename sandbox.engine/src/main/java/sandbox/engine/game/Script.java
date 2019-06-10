@@ -14,6 +14,6 @@ package sandbox.engine.game;
 public interface Script<C> {
 	void execute(C context);
 	
-	static final Script<?> EMPTY = (context) -> {
+	static final Script<Void> EMPTY = (context) -> {
 	};
 }

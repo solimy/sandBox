@@ -32,12 +32,10 @@ public class GraphicEntityComponent implements Component {
 	private Map<BodyPart, Animator2D> animators = new HashMap<>();
 	private final MovementSmoother movementSmoother;
 	private final WeakReference<Position> position;
-	private final GraphicApplication<?> application;
 
-	public GraphicEntityComponent(WeakReference<Position> position, GraphicApplication<?> application) {
+	public GraphicEntityComponent(WeakReference<Position> position) {
 		movementSmoother = new MovementSmoother(position);
 		this.position = position;
-		this.application = application;
 	}
 
 	public GraphicEntityComponent setAnimators(Map<BodyPart, Animator2D> animators) {
@@ -74,9 +72,9 @@ public class GraphicEntityComponent implements Component {
 		final Integer pixelUnit = CameraScript.INSTANCE.getPixelUnit();
 		final CameraScript.ScreenCoordinates screenCoordinates = CameraScript.INSTANCE.getDrawCursorPosition();
 		animators.forEach((key, animator) -> {
-			application.render(animator.getFrame(position.get().orientation).fit(pixelUnit, pixelUnit).setXY(
-					screenCoordinates.x - movementSmoother.xSmoother.get(currentTimeMillis),
-					screenCoordinates.y - movementSmoother.ySmoother.get(currentTimeMillis)));
+			GraphicApplication.INSTANCE.render(animator.getFrame(position.get().orientation).fit(pixelUnit, pixelUnit)
+					.setXY(screenCoordinates.x - movementSmoother.xSmoother.get(currentTimeMillis),
+							screenCoordinates.y - movementSmoother.ySmoother.get(currentTimeMillis)));
 		});
 	}
 

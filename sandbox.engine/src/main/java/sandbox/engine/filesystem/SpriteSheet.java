@@ -1,10 +1,8 @@
 package sandbox.engine.filesystem;
 
-import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +18,14 @@ public class SpriteSheet {
 
 	private final BufferedImage sheet;
 
-	public SpriteSheet(String url) {
+	public SpriteSheet(Class<?> klass, String ressourceUrl) {
+		this(klass.getResourceAsStream(ressourceUrl));
+	}
+	
+	public SpriteSheet(InputStream inStream) {
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(new URL(url));
+			image = ImageIO.read(inStream);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

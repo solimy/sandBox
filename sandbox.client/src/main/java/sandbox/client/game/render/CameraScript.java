@@ -23,7 +23,7 @@ import sandbox.engine.graphic.GraphicApplication;
 import sandbox.engine.math.CardinalOrientation;
 import sandbox.engine.math.Vector2D;
 
-public enum CameraScript implements Script<GraphicApplication<ClientScript>>, Component {
+public enum CameraScript implements Script<Void>, Component {
 	INSTANCE;
 
 	Integer height = 0;
@@ -87,7 +87,7 @@ public enum CameraScript implements Script<GraphicApplication<ClientScript>>, Co
 	}
 
 	@Override
-	public void execute(GraphicApplication<ClientScript> application) {
+	public void execute(Void unused) {
 		Engine.Clock.INSTANCE.updateMillis();
 		Long currentTimeMillis = Engine.Clock.INSTANCE.getCurrentTimeMillis();
 		Integer camXS = movementSmoother.xSmoother.get(currentTimeMillis);
@@ -104,7 +104,7 @@ public enum CameraScript implements Script<GraphicApplication<ClientScript>>, Co
 				screenCoordinates = new ScreenCoordinates(renderCoordinates);
 				screenCoordinates.x += camXS;
 				screenCoordinates.y += camYS;
-				application.render(TerrainRenderer.getSprite(cell.getTerrainType()).fit(pixelUnit, pixelUnit)
+				GraphicApplication.INSTANCE.render(TerrainRenderer.getSprite(cell.getTerrainType()).fit(pixelUnit, pixelUnit)
 						.setXY(screenCoordinates.x, screenCoordinates.y));
 			}
 		}

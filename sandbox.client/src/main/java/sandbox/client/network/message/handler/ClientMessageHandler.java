@@ -58,11 +58,11 @@ public class ClientMessageHandler implements MessageHandler<Message<?, ?>> {
 			if (gec == null) {
 				switch (wec.getNature().get()) {
 				case FIREBALL:
-					gec = new GraphicEntityComponent(wec.getPosition(), ClientScript.INSTANCE.context)
+					gec = new GraphicEntityComponent(wec.getPosition())
 							.setAnimators(FireballAnimator.wrap(BodyPart.BODY));
 					break;
 				default:
-					gec = new GraphicEntityComponent(wec.getPosition(), ClientScript.INSTANCE.context)
+					gec = new GraphicEntityComponent(wec.getPosition())
 							.setAnimators(SkeletonAnimator.wrap(BodyPart.BODY));
 					break;
 				}

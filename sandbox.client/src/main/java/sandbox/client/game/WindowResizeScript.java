@@ -7,12 +7,12 @@ import sandbox.client.game.render.CameraScript;
 import sandbox.engine.game.Script;
 import sandbox.engine.graphic.GraphicApplication;
 
-public enum WindowResizeScript implements Script<GraphicApplication<ClientScript>> {
+public enum WindowResizeScript implements Script<Void> {
 	INSTANCE;
 	
 	@Override
-	public void execute(GraphicApplication context) {
-		JFrame frame = context.getFrame();
+	public void execute(Void unused) {
+		JFrame frame = GraphicApplication.INSTANCE.getFrame();
 		CameraScript.INSTANCE.updateSize(frame.getWidth(), frame.getWidth());
 	}
 }
