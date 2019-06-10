@@ -3,3 +3,4 @@
 -add more AI
 -optimize
 -gestion UI menus (javafx scene nodes)
+-Better render, via renderList. Implement Camera in Engine.

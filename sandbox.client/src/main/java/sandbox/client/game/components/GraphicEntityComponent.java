@@ -32,10 +32,12 @@ public class GraphicEntityComponent implements Component {
 	private Map<BodyPart, Animator2D> animators = new HashMap<>();
 	private final MovementSmoother movementSmoother;
 	private final WeakReference<Position> position;
+	private final GraphicApplication<?> application;
 
-	public GraphicEntityComponent(WeakReference<Position> position) {
+	public GraphicEntityComponent(WeakReference<Position> position, GraphicApplication<?> application) {
 		movementSmoother = new MovementSmoother(position);
 		this.position = position;
+		this.application = application;
 	}
 
 	public GraphicEntityComponent setAnimators(Map<BodyPart, Animator2D> animators) {
@@ -72,10 +74,9 @@ public class GraphicEntityComponent implements Component {
 		final Integer pixelUnit = CameraScript.INSTANCE.getPixelUnit();
 		final CameraScript.ScreenCoordinates screenCoordinates = CameraScript.INSTANCE.getDrawCursorPosition();
 		animators.forEach((key, animator) -> {
-			animator.getFrame(position.get().orientation).setFit(pixelUnit, pixelUnit)
-					.setXY(screenCoordinates.x - movementSmoother.xSmoother.get(currentTimeMillis),
-							screenCoordinates.y - movementSmoother.ySmoother.get(currentTimeMillis))
-					.render(GraphicApplication.getGraphicsContext());
+			application.render(animator.getFrame(position.get().orientation).fit(pixelUnit, pixelUnit).setXY(
+					screenCoordinates.x - movementSmoother.xSmoother.get(currentTimeMillis),
+					screenCoordinates.y - movementSmoother.ySmoother.get(currentTimeMillis)));
 		});
 	}
 
@@ -94,10 +95,10 @@ public class GraphicEntityComponent implements Component {
 		}
 	}
 
-	private void onEventDeath(Entity attachedEntity, EntityDeathMessage deathMessage) {		
+	private void onEventDeath(Entity attachedEntity, EntityDeathMessage deathMessage) {
 		animators.forEach((bodyPart, animation) -> animation.play(AnimationsIds.DEATH, false));
 	}
-	
+
 	private void onEventMove(Entity attachedEntity, Move move) {
 		Coordinates oldCoorodinates = move.getOldPosition().coordinates;
 		CardinalOrientation oldOrientation = move.getOldPosition().orientation;
@@ -106,9 +107,9 @@ public class GraphicEntityComponent implements Component {
 		animators.forEach((bodyPart, animator) -> animator.play(AnimationsIds.WALK, false));
 		if ((oldCoorodinates.getChunkX() != position.get().coordinates.getChunkX()
 				|| oldCoorodinates.getChunkY() != position.get().coordinates.getChunkY())
-				&& !((WorldEntityComponent) ClientScript.INSTANCE.playerEntity
-						.getComponent(WorldEntityComponent.ID)).getPosition().get().coordinates
-								.isInChunkRange(position.get().coordinates, Constraints.VIEW_RANGE)) {
+				&& !((WorldEntityComponent) ClientScript.INSTANCE.playerEntity.getComponent(WorldEntityComponent.ID))
+						.getPosition().get().coordinates.isInChunkRange(position.get().coordinates,
+								Constraints.VIEW_RANGE)) {
 			World.INSTANCE.entityManager.removeEntity(attachedEntity);
 			return;
 		}

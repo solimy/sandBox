@@ -3,7 +3,7 @@ package sandbox.client.resources.animators;
 import java.util.HashMap;
 
 import sandbox.client.resources.Ressources;
-import sandbox.client.resources.SpriteSheet.ReadStyle;
+import sandbox.engine.filesystem.SpriteSheet.ReadStyle;
 import sandbox.engine.graphic.drawable.animation.Animation;
 import sandbox.engine.graphic.drawable.animation.Animator2D;
 import sandbox.engine.math.CardinalOrientation;

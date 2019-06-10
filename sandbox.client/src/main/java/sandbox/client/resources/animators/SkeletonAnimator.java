@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import sandbox.client.resources.Ressources;
-import sandbox.client.resources.SpriteSheet.ReadStyle;
 import sandbox.common.world.elements.entity.state.EntityState;
+import sandbox.engine.filesystem.SpriteSheet.ReadStyle;
 import sandbox.engine.graphic.GraphicApplication;
 import sandbox.engine.graphic.drawable.animation.Animation;
 import sandbox.engine.graphic.drawable.animation.Animator2D;

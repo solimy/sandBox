@@ -2,7 +2,6 @@ package sandbox.client.game.render;
 
 import java.lang.ref.WeakReference;
 
-import javafx.scene.canvas.GraphicsContext;
 import sandbox.client.ClientScript;
 import sandbox.client.game.utils.MovementSmoother;
 import sandbox.common.game.components.WorldEntityComponent;
@@ -24,7 +23,7 @@ import sandbox.engine.graphic.GraphicApplication;
 import sandbox.engine.math.CardinalOrientation;
 import sandbox.engine.math.Vector2D;
 
-public enum CameraScript implements Script<ClientScript>, Component {
+public enum CameraScript implements Script<GraphicApplication<ClientScript>>, Component {
 	INSTANCE;
 
 	Integer height = 0;
@@ -88,10 +87,8 @@ public enum CameraScript implements Script<ClientScript>, Component {
 	}
 
 	@Override
-	public void execute(ClientScript application) {
+	public void execute(GraphicApplication<ClientScript> application) {
 		Engine.Clock.INSTANCE.updateMillis();
-		GraphicsContext graphicsContext = GraphicApplication.getGraphicsContext();
-		graphicsContext.clearRect(0, 0, width, height);
 		Long currentTimeMillis = Engine.Clock.INSTANCE.getCurrentTimeMillis();
 		Integer camXS = movementSmoother.xSmoother.get(currentTimeMillis);
 		Integer camYS = movementSmoother.ySmoother.get(currentTimeMillis);
@@ -107,8 +104,8 @@ public enum CameraScript implements Script<ClientScript>, Component {
 				screenCoordinates = new ScreenCoordinates(renderCoordinates);
 				screenCoordinates.x += camXS;
 				screenCoordinates.y += camYS;
-				TerrainRenderer.getSprite(cell.getTerrainType()).setFit(pixelUnit, pixelUnit)
-						.setXY(screenCoordinates.x, screenCoordinates.y).render(graphicsContext);
+				application.render(TerrainRenderer.getSprite(cell.getTerrainType()).fit(pixelUnit, pixelUnit)
+						.setXY(screenCoordinates.x, screenCoordinates.y));
 			}
 		}
 		// draw entities
@@ -127,9 +124,7 @@ public enum CameraScript implements Script<ClientScript>, Component {
 		}
 	}
 
-	public void updateSize() {
-		height = (int) GraphicApplication.getGraphicsContext().getCanvas().getHeight();
-		width = (int) GraphicApplication.getGraphicsContext().getCanvas().getWidth();
+	public void updateSize(int width, int height) {
 		pixelUnit = height > width ? width / pixelUnitRatio : height / pixelUnitRatio;
 		pixelUnit = pixelUnit == 0 ? 1 : pixelUnit;
 		puHeight = height / pixelUnit;

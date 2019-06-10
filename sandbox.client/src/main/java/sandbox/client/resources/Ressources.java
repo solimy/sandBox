@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 
+import sandbox.engine.filesystem.SpriteSheet;
 import sandbox.engine.graphic.drawable.sprite.Sprite;
 
 public enum Ressources {
