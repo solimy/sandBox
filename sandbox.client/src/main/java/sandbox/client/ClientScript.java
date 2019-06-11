@@ -32,7 +32,7 @@ public enum ClientScript {
 		World.INSTANCE.entityManager.createChunkIfNotPresent(false);
 		World.INSTANCE.entityManager.askStateManagerBeforeMove(false);
 		ClientScript.INSTANCE.networkManager.connection.send(Messages.AUTH_CONNECT.build(new Token()));
-		GraphicApplication.INSTANCE.init();
+		GraphicApplication.INSTANCE.init("Sandbox Graphic Client", 800, 600);
 		GraphicApplication.INSTANCE.setFramesPerSecond(30L);
 		GraphicApplication.INSTANCE.setOnKeyPressedScript(KeysHandlerScript.INSTANCE);
 		GraphicApplication.INSTANCE.setOnResizeScript(WindowResizeScript.INSTANCE);

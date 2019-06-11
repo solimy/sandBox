@@ -26,7 +26,7 @@ class Visualizer {
 
 
 	public static void main(String[] args) {
-		GraphicApplication.INSTANCE.init();
+		GraphicApplication.INSTANCE.init("Visualize", 200, 200);
 		GraphicApplication.INSTANCE.setFramesPerSecond(10L);
 		GraphicApplication.INSTANCE.setOnResizeScript(Script.EMPTY);
 		GraphicApplication.INSTANCE.setOnRenderScript(Render.INSTANCE);

@@ -1,13 +1,5 @@
 package sandbox.client.resources;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
-import java.util.function.Supplier;
-
-import javax.imageio.ImageIO;
-
 import sandbox.engine.filesystem.SpriteSheet;
 import sandbox.engine.graphic.drawable.sprite.Sprite;
 
@@ -33,15 +25,6 @@ public enum Ressources {
 	public final Sprite SPRITE_ENTITY_ROCK;
 
 	public final Sprite SPRITE_ENTITY_PUMPKIN;
-
-	BufferedImage fileOpenener(String path) {
-		try {
-			return ImageIO.read(this.getClass().getResource(path));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 
 	private Ressources() {
 		FILE_notFound = new SpriteSheet(Ressources.class, "/assets/notFound.png");		

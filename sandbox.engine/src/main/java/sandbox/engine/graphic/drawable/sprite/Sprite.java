@@ -1,5 +1,6 @@
 package sandbox.engine.graphic.drawable.sprite;
 
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -69,7 +70,9 @@ public class Sprite {
 		return this;
 	}
 
-	public void render(Graphics2D context) {
-		context.drawImage(originalImage, x+xOrigin, y+yOrigin, null);
+	public void render(Graphics context) {
+		Image img = scaledImageRef.get();
+		if (img != null)
+			context.drawImage(img, x+xOrigin, y+yOrigin, null);
 	}
 }

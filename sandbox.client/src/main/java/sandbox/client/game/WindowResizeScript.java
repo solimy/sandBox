@@ -12,7 +12,9 @@ public enum WindowResizeScript implements Script<Void> {
 	
 	@Override
 	public void execute(Void unused) {
-		JFrame frame = GraphicApplication.INSTANCE.getFrame();
-		CameraScript.INSTANCE.updateSize(frame.getWidth(), frame.getWidth());
+		CameraScript.INSTANCE.updateSize(
+				GraphicApplication.INSTANCE.getWidth(),
+				GraphicApplication.INSTANCE.getWidth()
+		);
 	}
 }
