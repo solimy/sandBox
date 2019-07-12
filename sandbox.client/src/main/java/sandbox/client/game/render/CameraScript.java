@@ -42,18 +42,19 @@ public enum CameraScript implements Script<Void>, Component {
 		public Integer y = null;
 
 		public ScreenCoordinates(Coordinates coordinates) {
-			x = (coordinates.getWorldX() - CameraScript.this.position.coordinates.getWorldX()) * pixelUnit;
+			x = (coordinates.getWorldX() - CameraScript.INSTANCE.position.coordinates.getWorldX()) * pixelUnit;
 			y = height - pixelUnit
-					- ((coordinates.getWorldY() - CameraScript.this.position.coordinates.getWorldY()) * pixelUnit);
+					- ((coordinates.getWorldY() - CameraScript.INSTANCE.position.coordinates.getWorldY()) * pixelUnit);
 		}
 	}
 
 	public void move(Coordinates coordinates) {
-		this.position.coordinates.copy(coordinates);
+		position.coordinates.copy(coordinates);
 	}
 
 	public void center(Coordinates coordinates) {
-		this.position.coordinates.copy(coordinates).modWorldCoordinates(new Vector2D(-puWidth / 2, -puHeight / 2));
+		position.coordinates.copy(coordinates).modWorldCoordinates(new Vector2D(-puWidth / 2, -puHeight / 2));
+		System.out.println("Centered to:\n" + position.coordinates.toString());
 	}
 
 	public void move(CardinalOrientation move) {
@@ -125,6 +126,8 @@ public enum CameraScript implements Script<Void>, Component {
 	}
 
 	public void updateSize(int width, int height) {
+		this.height = height;
+		this.width = width;
 		pixelUnit = height > width ? width / pixelUnitRatio : height / pixelUnitRatio;
 		pixelUnit = pixelUnit == 0 ? 1 : pixelUnit;
 		puHeight = height / pixelUnit;

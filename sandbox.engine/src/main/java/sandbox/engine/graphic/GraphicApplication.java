@@ -64,12 +64,12 @@ public enum GraphicApplication {
 		while (running.get()) {
 			do {
 				do {
-					context = strategy.getDrawGraphics();
 					if (nextFrame > 0) {
 						Thread.sleep(nextFrame);
 					}
 					Engine.Clock.INSTANCE.updateMillis();
 					Long lastupdate = Engine.Clock.INSTANCE.getCurrentTimeMillis();
+					context = strategy.getDrawGraphics();
 					context.clearRect(0, 0, cameraDisplay.getWidth(), cameraDisplay.getHeight());
 					onRenderScrit.execute(null);
 					Engine.Clock.INSTANCE.updateMillis();

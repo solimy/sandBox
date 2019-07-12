@@ -13,7 +13,7 @@ public enum CoordinatesSerializer implements Serializer<Coordinates> {
 		ByteBuffer encoded = allocateAndSetApplicability(e, 3 * Integer.BYTES);
 		if (encoded.capacity() == Byte.BYTES)
 			return encoded;
-		System.out.println("encoded : " + e.toString());
+		//System.out.println("encoded : " + e.toString());
 		return encoded.putInt(e.getWorldX()).putInt(e.getWorldY()).putInt(e.getLayer());
 	}
 

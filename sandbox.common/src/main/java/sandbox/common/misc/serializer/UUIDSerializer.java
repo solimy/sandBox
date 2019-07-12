@@ -12,7 +12,7 @@ public enum UUIDSerializer implements Serializer<UUID> {
 		if (encoded.capacity() == Byte.BYTES)
 			return encoded;
 		byte[] uuid = e.toString().getBytes();
-		System.out.println("encoding uuid (capacity=" + encoded.capacity() + ") : \"" + e.toString() + "\"");
+		//System.out.println("encoding uuid (capacity=" + encoded.capacity() + ") : \"" + e.toString() + "\"");
 		return encoded.putInt(uuid.length).put(uuid);
 	}
 
@@ -22,7 +22,7 @@ public enum UUIDSerializer implements Serializer<UUID> {
 			return e;
 		byte[] uuid = new byte[buffer.getInt()];
 		buffer.get(uuid);
-		System.out.println("decoding uuid (length=" + uuid.length + ") : \"" + new String(uuid) + "\"");
+		//System.out.println("decoding uuid (length=" + uuid.length + ") : \"" + new String(uuid) + "\"");
 		e = UUID.fromString(new String(uuid));
 		return e;
 	}
