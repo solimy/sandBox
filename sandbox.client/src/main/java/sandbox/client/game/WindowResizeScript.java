@@ -14,7 +14,7 @@ public enum WindowResizeScript implements Script<Void> {
 	public void execute(Void unused) {
 		CameraScript.INSTANCE.updateSize(
 				GraphicApplication.INSTANCE.getWidth(),
-				GraphicApplication.INSTANCE.getWidth()
+				GraphicApplication.INSTANCE.getHeight()
 		);
 	}
 }
