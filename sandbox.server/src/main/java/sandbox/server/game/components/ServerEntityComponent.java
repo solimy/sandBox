@@ -122,8 +122,6 @@ public class ServerEntityComponent implements Component {
 	}
 	
 	private void onEventDespawn(Entity attachedEntity, Events depsawn) {
-		GameServer.INSTANCE.broadcast(positionRef.get().coordinates, Constraints.BROADCAST_RANGE,
-				Messages.ENTITY_DEATH.build(attachedEntity.getUUID()));
 		attachedEntity.remove();
 	}
 
