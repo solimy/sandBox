@@ -1,26 +1,26 @@
 package sandbox.client.resources;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 
+import sandbox.engine.Engine;
 import sandbox.engine.game.Script;
 import sandbox.engine.graphic.GraphicApplication;
-import sandbox.engine.graphic.drawable.animation.Animation;
-import sandbox.engine.math.Vector2D;
+import sandbox.engine.graphic.drawable.sprite.Sprite;
 
 class Visualizer {
 
 	enum Render implements Script<Void> {
 		INSTANCE;
 
-		Vector2D spritePos = new Vector2D(15, 10);
-		Animation animaion = new Animation(1000L,
-				Arrays.asList(Ressources.INSTANCE.FILE_terrain_atlas.extractSprite(15 * 32, 21 * 32, 32, 64)));
+		Sprite TOMBSTONE = Ressources.INSTANCE.FILE_terrain_atlas.extractSprite(15 * 32, 21 * 32, 32, 64).setSize(500, 1000);
 
 		@Override
 		public void execute(Void unused) {
-			GraphicApplication.INSTANCE.render(animaion.getFrame(0L).reset().fit(100, 100));
-			GraphicApplication.INSTANCE.render(animaion.getFrame(0L).reset().setOrigin(16,32));
+			GraphicApplication.INSTANCE.pixelUnit = 100;
+			GraphicApplication.INSTANCE.render(Ressources.INSTANCE.SPRITE_TERRAIN_GRASS_WATER1);
+			GraphicApplication.INSTANCE.render(TOMBSTONE.setOrigin(0,0));
+			if ((Engine.Clock.INSTANCE.getCurrentTimeMillis() / 1000) % 2 == 0)
+				GraphicApplication.INSTANCE.render(TOMBSTONE.setOrigin(50, -10));
 		}
 	}
 

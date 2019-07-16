@@ -8,7 +8,8 @@ import sandbox.common.game.components.WorldEntityComponent;
 import sandbox.common.game.events.Move;
 import sandbox.common.math.position.Coordinates;
 import sandbox.common.math.position.Position;
-import sandbox.common.protocol.Messages;
+import sandbox.common.protocol.messages.chunk.ChunkEntitiesGetMessage;
+import sandbox.common.protocol.messages.chunk.ChunkTerrainGetMessage;
 import sandbox.common.world.Constraints;
 import sandbox.common.world.elements.entity.state.EntityState;
 import sandbox.common.world.model.Cell;
@@ -20,6 +21,7 @@ import sandbox.engine.game.Entity;
 import sandbox.engine.game.Event;
 import sandbox.engine.game.Script;
 import sandbox.engine.graphic.GraphicApplication;
+import sandbox.engine.logging.Logger;
 import sandbox.engine.math.CardinalOrientation;
 import sandbox.engine.math.Vector2D;
 
@@ -54,11 +56,11 @@ public enum CameraScript implements Script<Void>, Component {
 
 	public void center(Coordinates coordinates) {
 		position.coordinates.copy(coordinates).modWorldCoordinates(new Vector2D(-puWidth / 2, -puHeight / 2));
-		System.out.println("Centered to:\n" + position.coordinates.toString());
+		Logger.INSTANCE.debug("Centered to:\n" + position.coordinates.toString());
 	}
 
 	public void move(CardinalOrientation move) {
-		System.out.println("moving the camera");
+		Logger.INSTANCE.debug("moving the camera");
 		Long currentTimeMillis = Engine.Clock.INSTANCE.getCurrentTimeMillis();
 		switch (move) {
 		case NORTH:
@@ -105,7 +107,7 @@ public enum CameraScript implements Script<Void>, Component {
 				screenCoordinates = new ScreenCoordinates(renderCoordinates);
 				screenCoordinates.x += camXS;
 				screenCoordinates.y += camYS;
-				GraphicApplication.INSTANCE.render(TerrainRenderer.getSprite(cell.getTerrainType()).fit(pixelUnit, pixelUnit)
+				GraphicApplication.INSTANCE.render(TerrainRenderer.getSprite(cell.getTerrainType())
 						.setXY(screenCoordinates.x, screenCoordinates.y));
 			}
 		}
@@ -130,14 +132,15 @@ public enum CameraScript implements Script<Void>, Component {
 		this.width = width;
 		pixelUnit = height > width ? width / pixelUnitRatio : height / pixelUnitRatio;
 		pixelUnit = pixelUnit == 0 ? 1 : pixelUnit;
+		GraphicApplication.INSTANCE.pixelUnit = pixelUnit;
 		puHeight = height / pixelUnit;
 		puWidth = width / pixelUnit;
-		System.out.println("height:" + height);
-		System.out.println("width:" + width);
-		System.out.println("pixelUnit:" + pixelUnit);
-		System.out.println("puHeight:" + puHeight);
-		System.out.println("puWidth:" + puWidth);
-		System.out.println("camera:" + position.coordinates.toString());
+		Logger.INSTANCE.debug("height:" + height);
+		Logger.INSTANCE.debug("width:" + width);
+		Logger.INSTANCE.debug("pixelUnit:" + pixelUnit);
+		Logger.INSTANCE.debug("puHeight:" + puHeight);
+		Logger.INSTANCE.debug("puWidth:" + puWidth);
+		Logger.INSTANCE.debug("camera:" + position.coordinates.toString());
 		if (ClientScript.INSTANCE.playerEntity != null)
 			center(((WorldEntityComponent) ClientScript.INSTANCE.playerEntity.getComponent(WorldEntityComponent.ID))
 					.getPosition().get().coordinates);
@@ -218,8 +221,7 @@ public enum CameraScript implements Script<Void>, Component {
 							Coordinates coordinates = new Coordinates(newCoorodinates)
 									.modChunkCoordinates(modifierMove, null);
 							// TODO refaire propre
-							ClientScript.INSTANCE.networkManager.connection
-							.send(Messages.CHUNK_ENTITIES_GET.build(coordinates));
+							ClientScript.INSTANCE.connection.send(new ChunkEntitiesGetMessage(coordinates));
 						}
 					}
 				}
@@ -230,8 +232,7 @@ public enum CameraScript implements Script<Void>, Component {
 								.modChunkCoordinates(modifierMove, null);
 						// TODO refaire propre
 						if (World.INSTANCE.getNullChunk(coordinates) == null) {
-							ClientScript.INSTANCE.networkManager.connection
-							.send(Messages.CHUNK_TERRAIN_GET.build(coordinates));
+							ClientScript.INSTANCE.connection.send(new ChunkTerrainGetMessage(coordinates));
 						}
 					}
 				}

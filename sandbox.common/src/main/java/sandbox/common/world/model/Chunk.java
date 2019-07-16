@@ -1,28 +1,53 @@
 package sandbox.common.world.model;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
+import sandbox.engine.misc.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.locks.ReentrantLock;
 
-import sandbox.common.game.components.WorldEntityComponent;
 import sandbox.common.math.position.Coordinates;
 import sandbox.common.world.enums.BiomeType;
 import sandbox.common.world.enums.TerrainType;
 import sandbox.engine.game.Entity;
 import sandbox.engine.game.Spawner;
+import sandbox.engine.logging.Logger;
+import sandbox.engine.network.serialization.Deserializer;
+import sandbox.engine.network.serialization.Serializable;
+import sandbox.engine.network.serialization.SerializableRegistryService;
+import sandbox.engine.network.serialization.Serializer;
 
-public class Chunk {
-	private final AtomicLong lastUpdate = new AtomicLong(0L);
-	public boolean isGenerated = false;
+public class Chunk implements Serializable {
+	public static final int TYPE = Chunk.class.getName().hashCode();
+	
+	public static final Deserializer DESERIALIZER = buffer -> {
+		Chunk chunk = new Chunk();
+		chunk.coordinates.copy((Coordinates) Serializer.deserializeNext(buffer));
+		for (int i = 0; i < Chunk.LENGTH; i++) {
+			for (int j = 0; j < Chunk.WIDTH; j++) {
+				int biomeTypeOrdinal = buffer.getInt();
+				int terrainTypeOrdinal = buffer.getInt();
+				BiomeType biomeType = BiomeType.getByOridinal(biomeTypeOrdinal);
+				TerrainType terrainType = TerrainType.getByOrdinal(terrainTypeOrdinal);
+				Coordinates coordinates = new Coordinates(Chunk.WIDTH, Chunk.LENGTH)
+						.setWorldCoordinates(buffer.getInt(), buffer.getInt(), buffer.getInt());
+				chunk.cells[i][j] = new Cell(coordinates, biomeType, terrainType);
+			}
+		}
+		chunk.isGenerated = true;
+		return chunk;
+	};
+	
 	public static final Integer WIDTH = 8;
 	public static final Integer LENGTH = 8;
+
+	private final AtomicLong lastUpdate = new AtomicLong(0L);
 	public final Cell[][] cells = new Cell[LENGTH][WIDTH];
+	public boolean isGenerated = false;
 	public final Map<UUID, Entity> dynamicEntities = new ConcurrentHashMap<>();
 	public final Coordinates coordinates = new Coordinates(Chunk.WIDTH, Chunk.LENGTH);
 
@@ -37,7 +62,7 @@ public class Chunk {
 						&& random.nextBoolean()) {
 					Spawner spawner = cell.getTerrainType().spawners
 							.get(random.nextInt(cell.getTerrainType().spawners.size()));
-					worldMap.entityManager.put(cell.getCoordinates(), spawner.spawn(UUID.randomUUID()), true);
+					worldMap.entityManager.put(cell.getCoordinates(), spawner.spawn(new UUID()), true);
 				}
 			}
 		}
@@ -82,7 +107,7 @@ public class Chunk {
 				if (neighbour != null)
 					neighbours.add(neighbour);
 				if (neighbours.isEmpty()) {
-					System.out.println(new Date(System.currentTimeMillis()).toString() + ": " + Thread.currentThread()
+					Logger.INSTANCE.debug(new Date(System.currentTimeMillis()).toString() + ": " + Thread.currentThread()
 							+ ":\n=> Chunk.Generate: no neighbours found at (" + chunkX + "," + chunkY + ")");
 					biomeType = BiomeType.values()[random.nextInt(BiomeType.values().length)];
 					terrainType = biomeType.possibleTerrains.get(random.nextInt(biomeType.possibleTerrains.size()));
@@ -107,7 +132,7 @@ public class Chunk {
 			}
 		}
 		chunk.isGenerated = true;
-		// System.out.println(
+		// Logger.INSTANCE.debug(
 		// "world size : " + worldMap.getTotalChunksCount() + " chunks, " +
 		// worldMap.getTotalDynamicEntitiesCount()
 		// + " dynamic entities");
@@ -126,6 +151,33 @@ public class Chunk {
 		if (lastUpdate.getAndSet(currentTimeMillis) == currentTimeMillis)
 			return;
 		dynamicEntities.values().parallelStream().forEach(Entity::update);
+	}
+
+	@Override
+	public ByteBuffer encodePayload() {
+		ByteBuffer buffer = ByteBuffer.allocate(0);
+		ByteBuffer chunkCoorinates = Serializer.serialize(this.coordinates);
+		buffer = ByteBuffer
+				.allocate(buffer.capacity() + chunkCoorinates.capacity() + (Chunk.LENGTH * Chunk.WIDTH * Integer.BYTES * 5))
+				.put(chunkCoorinates);
+		for (int i = 0; i < Chunk.LENGTH; i++) {
+			for (int j = 0; j < Chunk.WIDTH; j++) {
+				Cell cell = cells[i][j];
+				Coordinates coordinates = cell.getCoordinates();
+				buffer
+					.putInt(cell.getBiomeType().ordinal())
+					.putInt(cell.getTerrainType().ordinal())
+					.putInt(coordinates.getWorldX())
+					.putInt(coordinates.getWorldY())
+					.putInt(coordinates.getLayer());
+			}
+		}
+		return buffer;
+	}
+
+	@Override
+	public Integer getType() {
+		return TYPE;
 	}
 
 }

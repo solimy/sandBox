@@ -3,28 +3,20 @@ package sandbox.engine.network.message;
 import java.nio.ByteBuffer;
 
 public class Header {
-	private Integer messageSize = null;
-	private Integer messageType = null;
+	public static final Short SIZE =Integer.BYTES * 3; 
+	public final Integer messageSize;
+	public final Integer messageType;
+	public final Integer messageWordsCount;
 	
-	public static Integer getSize() {
-		return Integer.BYTES * 2;
-	}
-	
-	public Integer getMessageSize() {
-		return messageSize;
+	public Header(ByteBuffer buffer) {
+		this.messageType = buffer.getInt();
+		this.messageSize = buffer.getInt();
+		this.messageWordsCount = buffer.getInt();
 	}
 
-	public Integer getMessageType() {
-		return messageType;
-	}
-	
-	public void read(ByteBuffer buffer) {
-		this.messageSize = buffer.getInt();
-		this.messageType = buffer.getInt();
-	}
-	
-	public void reset() {
-		this.messageSize = null;
-		this.messageType = null;
+	public Header(Integer messageType, Integer messageSize, Integer messageWordsCount) {
+		this.messageType = messageType;
+		this.messageSize = messageSize;
+		this.messageWordsCount = messageWordsCount;
 	}
 }

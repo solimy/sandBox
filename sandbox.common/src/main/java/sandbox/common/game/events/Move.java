@@ -1,13 +1,24 @@
 package sandbox.common.game.events;
 
-import java.util.UUID;
+import java.nio.ByteBuffer;
 
 import sandbox.common.math.position.Position;
 import sandbox.engine.game.Event;
 import sandbox.engine.math.CardinalOrientation;
+import sandbox.engine.misc.UUID;
+import sandbox.engine.network.serialization.Deserializer;
+import sandbox.engine.network.serialization.Serializable;
+import sandbox.engine.network.serialization.SerializableRegistryService;
+import sandbox.engine.network.serialization.Serializer;
 
-public class Move implements Event {
-
+public class Move implements Event, Serializable {
+	public static final int TYPE = Move.class.getName().hashCode();
+	
+	public static final Deserializer DESERIALIZER = buffer -> {
+		UUID uuid = (UUID) Serializer.deserializeNext(buffer);
+		CardinalOrientation movement = CardinalOrientation.getByOrdinal(buffer.getInt());
+		return new Move(uuid, movement);
+	};
 	
 	public static class Request implements Event {
 		Move move;
@@ -77,5 +88,20 @@ public class Move implements Event {
 	
 	public Position getNewPosition() {
 		return newPosition;
+	}
+
+	@Override
+	public ByteBuffer encodePayload() {
+		ByteBuffer moving = Serializer.serialize(this.moving);
+		ByteBuffer payload = ByteBuffer
+				.allocate(moving.capacity() + Integer.BYTES)
+				.put(moving)
+				.putInt(movement.ordinal());
+		return payload;
+	}
+
+	@Override
+	public Integer getType() {
+		return TYPE;
 	}
 }

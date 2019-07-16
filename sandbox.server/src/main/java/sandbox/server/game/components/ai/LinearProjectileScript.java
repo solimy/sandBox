@@ -2,22 +2,20 @@ package sandbox.server.game.components.ai;
 
 import java.lang.ref.WeakReference;
 import java.util.Collection;
-import java.util.UUID;
 
 import sandbox.common.game.events.Damage;
 import sandbox.common.game.events.Events;
 import sandbox.common.game.events.Move;
 import sandbox.common.math.position.Position;
-import sandbox.common.protocol.Messages;
-import sandbox.common.world.Constraints;
 import sandbox.common.world.elements.entity.state.EntityState;
 import sandbox.common.world.model.World;
 import sandbox.engine.Engine;
 import sandbox.engine.game.Component;
 import sandbox.engine.game.Entity;
 import sandbox.engine.game.Event;
+import sandbox.engine.logging.Logger;
+import sandbox.engine.misc.UUID;
 import sandbox.engine.state.TimedStateManager;
-import sandbox.server.game.GameServer;
 
 public class LinearProjectileScript implements AI, Component {
 	public static final String ID = "LinearProjectileScript";
@@ -63,7 +61,7 @@ public class LinearProjectileScript implements AI, Component {
 			return;
 
 		if (attachedEntity.getCreationTimeMillis() - time >= TTL || DTT == 0) {
-			System.out.println(Events.KILLED.name());
+			Logger.INSTANCE.debug(Events.KILLED.name());
 			attachedEntity.trigger(Events.KILLED);
 			return;
 		}

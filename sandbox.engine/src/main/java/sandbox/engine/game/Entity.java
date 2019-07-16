@@ -1,8 +1,10 @@
 package sandbox.engine.game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import sandbox.engine.misc.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -16,7 +18,8 @@ public final class Entity implements Component {
 	private String name = "";
 	private final AtomicBoolean removed = new AtomicBoolean(false);
 
-	private final Map<String, Component> components = new HashMap<String, Component>();
+	private final Map<String, Component> componentsMap = new HashMap<String, Component>();
+	private final List<Component> componentsList = new ArrayList<Component>();
 
 	public Entity(UUID uuid) {
 		this.uuid = uuid;
@@ -93,12 +96,13 @@ public final class Entity implements Component {
 	}
 
 	public Entity addComponent(String componentID, Component component) {
-		components.put(componentID, component);
+		componentsMap.put(componentID, component);
+		componentsList.add(component);
 		return this;
 	}
 
 	public Component getComponent(String componentID) {
-		return components.get(componentID);
+		return componentsMap.get(componentID);
 	}
 
 	public UUID getUUID() {
@@ -120,32 +124,38 @@ public final class Entity implements Component {
 
 	@Override
 	public void onCreate(Entity attachedEntity) {
-		components.values().forEach(component -> component.onCreate(attachedEntity));
+		for (Component component : componentsList)
+			component.onCreate(attachedEntity);
 	}
 
 	@Override
 	public void onRemove(Entity attachedEntity) {
-		components.values().forEach(component -> component.onRemove(attachedEntity));
+		for (Component component : componentsList)
+			component.onRemove(attachedEntity);
 	}
 
 	@Override
 	public void onUpdate(Entity attachedEntity) {
-		components.values().forEach(component -> component.onUpdate(attachedEntity));
+		for (Component component : componentsList)
+			component.onUpdate(attachedEntity);
 	}
 
 	@Override
 	public void onRender(Entity attachedEntity) {
-		components.values().forEach(component -> component.onRender(attachedEntity));
+		for (Component component : componentsList)
+			component.onRender(attachedEntity);
 	}
 
 	@Override
 	public void onUse(Entity attachedEntity, Entity user) {
-		components.values().forEach(component -> component.onUse(attachedEntity, user));
+		for (Component component : componentsList)
+			component.onUse(attachedEntity, user);
 	}
 
 	@Override
 	public void onEvent(Entity attachedEntity, Event event) {
-		components.values().forEach(component -> component.onEvent(attachedEntity, event));
+		for (Component component : componentsList)
+			component.onEvent(attachedEntity, event);
 	}
 
 	@Override

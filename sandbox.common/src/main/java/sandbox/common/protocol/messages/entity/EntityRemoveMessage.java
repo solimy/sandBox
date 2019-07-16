@@ -1,30 +1,21 @@
 package sandbox.common.protocol.messages.entity;
 
-import java.nio.ByteBuffer;
-import java.util.UUID;
+import sandbox.engine.misc.UUID;
+import sandbox.engine.network.message.ProtocolMessage;
+import sandbox.engine.network.message.RawMessage;
 
-import sandbox.common.misc.serializer.UUIDSerializer;
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageAllocator;
+public class EntityRemoveMessage extends ProtocolMessage {
+	public static Integer TYPE = EntityRemoveMessage.class.getName().hashCode();
 
-public class EntityRemoveMessage extends Message<EntityRemoveMessage, UUID> {
-
-	protected EntityRemoveMessage(UUID uuid) {
-		super(type, uuid);
+	public final UUID uuid;
+	
+	public EntityRemoveMessage(UUID uuid) {
+		super(new RawMessage(TYPE, uuid));
+		this.uuid = uuid;
 	}
-
-	@Override
-	protected ByteBuffer encode() {
-		ByteBuffer uuid = UUIDSerializer.INSTANCE.encode(attachment);
-		uuid.flip();
-		return ByteBuffer.allocate(uuid.remaining()).put(uuid);
+	
+	public EntityRemoveMessage(RawMessage rawMessage) {
+		super(rawMessage);
+		uuid = (UUID) rawMessage.getWord(0);
 	}
-
-	@Override
-	protected void decode(ByteBuffer inputBuffer) {
-		attachment = UUIDSerializer.INSTANCE.decode(attachment, inputBuffer);
-	}
-
-	public static Integer type = EntityRemoveMessage.class.getName().hashCode();
-	public static MessageAllocator<EntityRemoveMessage, UUID> allocator = (uuid) -> new EntityRemoveMessage(uuid);
 }

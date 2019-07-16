@@ -1,6 +1,7 @@
 package sandbox.client.resources;
 
 import sandbox.engine.filesystem.SpriteSheet;
+import sandbox.engine.graphic.GraphicApplication;
 import sandbox.engine.graphic.drawable.sprite.Sprite;
 
 public enum Ressources {
@@ -25,8 +26,10 @@ public enum Ressources {
 	public final Sprite SPRITE_ENTITY_ROCK;
 
 	public final Sprite SPRITE_ENTITY_PUMPKIN;
+	public final Sprite SPRITE_ENTITY_TOMBSTONE;
 
 	private Ressources() {
+		GraphicApplication.INSTANCE.pixelUnit = 100;
 		FILE_notFound = new SpriteSheet(Ressources.class, "/assets/notFound.png");		
 		FILE_terrain_atlas = new SpriteSheet(Ressources.class, "/assets/terrain_atlas.png");
 		FILE_obj_misk_atlas = new SpriteSheet(Ressources.class, "/assets/obj_misk_atlas.png");
@@ -36,14 +39,19 @@ public enum Ressources {
 		FILE_aks = new SpriteSheet(Ressources.class, "/assets/aks_assets.png");
 		
 		SPRITE_NOT_FOUND = FILE_explosion.extractSprite();
-		SPRITE_TERRAIN_GRASS = FILE_terrain_atlas.extractSprite(32 * 22, 32 * 5, 32, 32);
-		SPRITE_TERRAIN_GRASS_WATER1 = FILE_terrain_atlas.extractSprite(32 * 6, 32 * 9, 32, 32);
-		SPRITE_TERRAIN_GRASS_WATER2 = FILE_terrain_atlas.extractSprite(32 * 6, 32 * 10, 32, 32);
-		SPRITE_TERRAIN_GRASS_DIRT = FILE_terrain_atlas.extractSprite(32 * 5, 32 * 15, 32, 32);
+		SPRITE_TERRAIN_GRASS = FILE_terrain_atlas.extractSprite(32 * 22, 32 * 5, 32, 32).setSize(1000, 1000);
+		SPRITE_TERRAIN_GRASS_WATER1 = FILE_terrain_atlas.extractSprite(32 * 6, 32 * 9, 32, 32).setSize(1000, 1000);
+		SPRITE_TERRAIN_GRASS_WATER2 = FILE_terrain_atlas.extractSprite(32 * 6, 32 * 10, 32, 32).setSize(1000, 1000);
+		SPRITE_TERRAIN_GRASS_DIRT = FILE_terrain_atlas.extractSprite(32 * 5, 32 * 15, 32, 32).setSize(1000, 1000);
 
-		SPRITE_ENTITY_FLOWER = FILE_terrain_atlas.extractSprite(32 * 6, 32 * 31, 32, 32);
-		SPRITE_ENTITY_ROCK = FILE_terrain_atlas.extractSprite(32 * 29, 32 * 25, 32, 32);
+		SPRITE_ENTITY_FLOWER = FILE_terrain_atlas.extractSprite(32 * 6, 32 * 31, 32, 32).setSize(250, 250);
+		SPRITE_ENTITY_ROCK = FILE_terrain_atlas.extractSprite(32 * 29, 32 * 25, 32, 32).setSize(1000, 1000);
 
-		SPRITE_ENTITY_PUMPKIN = FILE_obj_misk_atlas.extractSprite(32 * 21, 32 * 5, 32, 32);
+		SPRITE_ENTITY_PUMPKIN = FILE_obj_misk_atlas.extractSprite(32 * 21, 32 * 5, 32, 32).setSize(250, 250);
+		SPRITE_ENTITY_TOMBSTONE = 
+				FILE_terrain_atlas
+				.extractSprite(15 * 32, 21 * 32, 32, 64)
+				.setSize(500, 1000)
+				.setOrigin(50, -15);
 	}
 }

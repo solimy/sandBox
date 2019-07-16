@@ -1,0 +1,7 @@
+#!/bin/sh
+screen -L -Logfile "logs/sandbox.server.$(date +'%m-%d-%Y %H:%M:%S').log" -mS "sandbox.server.$(date +'%m-%d-%Y %H:%M:%S')" bash -c "
+    gradle clean assemble -b sandbox.server/build.gradle \
+    && \
+    LOGLEVEL=DEBUG java -jar sandbox.server/build/libs/SandBox-Server-0.0.1.jar
+"
+

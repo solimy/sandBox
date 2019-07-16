@@ -1,11 +1,10 @@
 package sandbox.common.game.components;
 
 import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
 
 import sandbox.common.game.events.Events;
 import sandbox.common.game.events.Move;
-import sandbox.common.game.events.Move.Request;
-import sandbox.common.math.position.Coordinates;
 import sandbox.common.math.position.Position;
 import sandbox.common.protocol.messages.entity.EntityDeathMessage;
 import sandbox.common.protocol.messages.entity.EntityMoveMessage;
@@ -16,11 +15,23 @@ import sandbox.common.world.model.World;
 import sandbox.engine.game.Component;
 import sandbox.engine.game.Entity;
 import sandbox.engine.game.Event;
-import sandbox.engine.math.CardinalOrientation;
-import sandbox.engine.math.Vector2D;
+import sandbox.engine.logging.Logger;
+import sandbox.engine.network.serialization.Deserializer;
+import sandbox.engine.network.serialization.Serializable;
+import sandbox.engine.network.serialization.SerializableRegistryService;
+import sandbox.engine.network.serialization.Serializer;
 import sandbox.engine.state.TimedStateManager;
 
-public class WorldEntityComponent implements Component {
+public class WorldEntityComponent implements Component, Serializable {
+	public static final int TYPE = WorldEntityComponent.class.getName().hashCode();
+	
+	public static final Deserializer DESERIALIZER = buffer -> {
+		Position position = (Position) Serializer.deserializeNext(buffer);
+		EntityNature nature = (EntityNature) Serializer.deserializeNext(buffer); 
+		WorldEntityComponent wec = new WorldEntityComponent(position, nature);
+		return wec;
+	};
+	
 	public static final String ID = "wec";
 	private final Position position;
 	private final WeakReference<Position> positionRef;
@@ -38,7 +49,7 @@ public class WorldEntityComponent implements Component {
 	}
 
 	public final Boolean isInChunkRange(WorldEntityComponent other, Integer rangeLimit) {
-		System.out.println(position.coordinates.getChunkX() + " " + other.position.coordinates.getChunkX());
+		Logger.INSTANCE.debug(position.coordinates.getChunkX() + " " + other.position.coordinates.getChunkX());
 		return other == null ? false : position.coordinates.isInChunkRange(other.position.coordinates, rangeLimit);
 	}
 
@@ -62,7 +73,7 @@ public class WorldEntityComponent implements Component {
 	@Override
 	public void onRemove(Entity attachedEntity) {
 		World.INSTANCE.entityManager.removeEntity(attachedEntity);
-		System.out.println("remove entity \"" + attachedEntity.getUUID() + "\" from World");
+		Logger.INSTANCE.debug("remove entity \"" + attachedEntity.getUUID() + "\" from World");
 	}
 
 	@Override
@@ -97,7 +108,7 @@ public class WorldEntityComponent implements Component {
 	}
 
 	private void onEventEntityRemoveMessage(Entity attachedEntity, EntityDeathMessage remove) {
-		World.INSTANCE.entityManager.removeEntity(remove.attachment);
+		World.INSTANCE.entityManager.removeEntity(remove.uuid);
 	}
 
 	private void onEventEntityDeathMessage(Entity attachedEntity, EntityDeathMessage death) {
@@ -106,7 +117,7 @@ public class WorldEntityComponent implements Component {
 	}
 
 	private void onEventEntityMoveMessage(Entity attachedEntity, EntityMoveMessage move) {
-		onEventEntityMoveRequest(attachedEntity, move.attachment.request(position, position.copy().moveForward(1)));
+		onEventEntityMoveRequest(attachedEntity, move.move.request(position, position.copy().moveForward(1)));
 	}
 
 	private void onEventEntityMoveRequest(Entity attachedEntity, Move.Request move) {
@@ -121,5 +132,20 @@ public class WorldEntityComponent implements Component {
 	@Override
 	public String getId() {
 		return ID;
+	}
+
+	@Override
+	public ByteBuffer encodePayload() {
+		ByteBuffer position = Serializer.serialize(this.position);
+		ByteBuffer nature = Serializer.serialize(this.nature);
+		return ByteBuffer
+				.allocate(position.capacity() + nature.capacity())
+				.put(position)
+				.put(nature);
+	}
+
+	@Override
+	public Integer getType() {
+		return TYPE;
 	}
 }

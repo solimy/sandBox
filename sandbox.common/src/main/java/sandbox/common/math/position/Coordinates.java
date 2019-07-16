@@ -1,10 +1,32 @@
 package sandbox.common.math.position;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
+
+import sandbox.engine.logging.Logger;
 import sandbox.engine.math.CardinalOrientation;
 import sandbox.engine.math.Vector2D;
 import sandbox.engine.misc.Copyable;
+import sandbox.engine.misc.UUID;
+import sandbox.engine.network.message.Header;
+import sandbox.engine.network.message.RawMessage;
+import sandbox.engine.network.serialization.Deserializer;
+import sandbox.engine.network.serialization.Serializable;
+import sandbox.engine.network.serialization.SerializableRegistryService;
 
-public class Coordinates implements Copyable<Coordinates> {
+public class Coordinates implements Copyable<Coordinates>, Serializable {
+	public static final int TYPE = Coordinates.class.getName().hashCode();
+	
+	public static final Deserializer DESERIALIZER = buffer -> {
+		Integer subLayerLength = buffer.getInt();
+		Integer subLayerWidth = buffer.getInt();
+		Integer worldX = buffer.getInt();
+		Integer worldY = buffer.getInt();
+		Integer layer = buffer.getInt();
+		return new Coordinates(subLayerWidth, subLayerLength).setWorldCoordinates(worldX, worldY, layer);
+	};
+	
 	private Integer subLayerWidth;
 	private Integer subLayerLength;
 	private Integer worldX = 0;
@@ -92,12 +114,6 @@ public class Coordinates implements Copyable<Coordinates> {
 		this.worldY = ((chunkY) * subLayerLength) + inChunkY;
 		this.layer = layer;
 		return this;
-	}
-
-	@Override
-	public String toString() {
-		return "Coordinates [worldX=" + worldX + ", worldY=" + worldY + ", chunkX=" + chunkX + ", chunkY=" + chunkY
-				+ ", inChunkX=" + inChunkX + ", inChunkY=" + inChunkY + ", layer=" + layer + "]";
 	}
 
 	public Integer getWorldX() {
@@ -224,5 +240,44 @@ public class Coordinates implements Copyable<Coordinates> {
 	@Override
 	public Coordinates copy() {
 		return new Coordinates(this);
+	}
+	
+	@Override
+	public String toString() {
+		return "Coordinates [worldX=" + worldX + ", worldY=" + worldY + ", chunkX=" + chunkX + ", chunkY=" + chunkY
+				+ ", inChunkX=" + inChunkX + ", inChunkY=" + inChunkY + ", layer=" + layer + "]";
+	}
+
+	@Override
+	public ByteBuffer encodePayload() {
+		ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES * 5);
+		buffer.putInt(subLayerLength);
+		buffer.putInt(subLayerWidth);
+		buffer.putInt(worldX);
+		buffer.putInt(worldY);
+		buffer.putInt(layer);
+		return buffer;
+	}
+
+	@Override
+	public Integer getType() {
+		return TYPE;
+	}
+	
+
+	public static void main(String[] args) {
+		List<Coordinates> coordinates = Arrays.asList(
+				new Coordinates(10, 10).setWorldCoordinates(1, 87, 8),
+				new Coordinates(5, 5).setWorldCoordinates(100, 234, 0)
+		);
+		coordinates.forEach(Logger.INSTANCE::debug);
+		RawMessage rawMessage = new RawMessage(0, coordinates.toArray(new Serializable[coordinates.size()]));
+		ByteBuffer byteBuffer = rawMessage.getAsByteBuffer();
+		Header header = new Header(byteBuffer);
+		byteBuffer = byteBuffer.compact();
+		rawMessage = new RawMessage(header, byteBuffer);
+		for (int i = 0; i < coordinates.size(); ++i) {
+			Logger.INSTANCE.debug(((Coordinates) rawMessage.getWord(i)));
+		}
 	}
 }

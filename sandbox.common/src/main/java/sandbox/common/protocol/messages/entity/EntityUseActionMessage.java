@@ -1,25 +1,18 @@
 package sandbox.common.protocol.messages.entity;
 
-import java.nio.ByteBuffer;
+import sandbox.engine.game.Event;
+import sandbox.engine.network.message.ProtocolMessage;
+import sandbox.engine.network.message.RawMessage;
+import sandbox.engine.network.serialization.Serializable;
 
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageAllocator;
+public class EntityUseActionMessage extends ProtocolMessage implements Event {
+	public static final int TYPE = EntityUseActionMessage.class.getName().hashCode();
 
-public class EntityUseActionMessage extends Message<EntityUseActionMessage, Object> {
-
-	protected EntityUseActionMessage(Object notUsed) {
-		super(EntityUseActionMessage.type, notUsed);
+	public EntityUseActionMessage() {
+		super(new RawMessage(TYPE, (Serializable[])null));
 	}
-
-	@Override
-	protected ByteBuffer encode() {
-		return null;
+	
+	public EntityUseActionMessage(RawMessage rawMessage) {
+		super(rawMessage);
 	}
-
-	@Override
-	protected void decode(ByteBuffer inputBuffer) {
-	}
-
-	public static Integer type = EntityUseActionMessage.class.getName().hashCode();
-	public static MessageAllocator<EntityUseActionMessage, Object> allocator = (notUsed) -> new EntityUseActionMessage(notUsed);
 }

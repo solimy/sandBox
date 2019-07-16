@@ -12,7 +12,6 @@ import sandbox.common.game.components.WorldEntityComponent;
 import sandbox.common.game.events.Move;
 import sandbox.common.math.position.Coordinates;
 import sandbox.common.math.position.Position;
-import sandbox.common.protocol.Messages;
 import sandbox.common.protocol.messages.entity.EntityDeathMessage;
 import sandbox.common.world.Constraints;
 import sandbox.common.world.elements.entity.BodyPart;
@@ -25,7 +24,6 @@ import sandbox.engine.game.Event;
 import sandbox.engine.graphic.GraphicApplication;
 import sandbox.engine.graphic.drawable.animation.Animator2D;
 import sandbox.engine.math.CardinalOrientation;
-import sandbox.engine.math.Vector2D;
 
 public class GraphicEntityComponent implements Component {
 	public static final String ID = "gec";
@@ -69,10 +67,9 @@ public class GraphicEntityComponent implements Component {
 	@Override
 	public void onRender(Entity attachedEntity) {
 		final Long currentTimeMillis = Engine.Clock.INSTANCE.getCurrentTimeMillis();
-		final Integer pixelUnit = CameraScript.INSTANCE.getPixelUnit();
 		final CameraScript.ScreenCoordinates screenCoordinates = CameraScript.INSTANCE.getDrawCursorPosition();
 		animators.forEach((key, animator) -> {
-			GraphicApplication.INSTANCE.render(animator.getFrame(position.get().orientation).fit(pixelUnit, pixelUnit)
+			GraphicApplication.INSTANCE.render(animator.getFrame(position.get().orientation)
 					.setXY(screenCoordinates.x - movementSmoother.xSmoother.get(currentTimeMillis),
 							screenCoordinates.y - movementSmoother.ySmoother.get(currentTimeMillis)));
 		});

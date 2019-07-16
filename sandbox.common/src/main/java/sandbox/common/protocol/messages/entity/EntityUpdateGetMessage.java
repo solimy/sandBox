@@ -1,28 +1,21 @@
 package sandbox.common.protocol.messages.entity;
 
-import java.nio.ByteBuffer;
-import java.util.UUID;
+import sandbox.engine.misc.UUID;
+import sandbox.engine.network.message.ProtocolMessage;
+import sandbox.engine.network.message.RawMessage;
 
-import sandbox.common.misc.serializer.UUIDSerializer;
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageAllocator;
+public class EntityUpdateGetMessage extends ProtocolMessage {
+	public static final Integer TYPE = EntityUpdateGetMessage.class.getName().hashCode();
 
-public class EntityUpdateGetMessage extends Message<EntityUpdateGetMessage, UUID> {
-
-	protected EntityUpdateGetMessage(UUID uuid) {
-		super(type, uuid);
+	public final UUID uuid;
+	
+	public EntityUpdateGetMessage(UUID uuid) {
+		super(new RawMessage(TYPE, uuid));
+		this.uuid = uuid;
 	}
-
-	@Override
-	protected ByteBuffer encode() {
-		return UUIDSerializer.INSTANCE.encode(attachment);
+	
+	public EntityUpdateGetMessage(RawMessage rawMessage) {
+		super(rawMessage);
+		uuid = (UUID) rawMessage.getWord(0);
 	}
-
-	@Override
-	protected void decode(ByteBuffer inputBuffer) {
-		attachment = UUIDSerializer.INSTANCE.decode(attachment, inputBuffer);
-	}
-
-	public static final Integer type = EntityUpdateGetMessage.class.getName().hashCode();
-	public static final MessageAllocator<EntityUpdateGetMessage, UUID> allocator = (uuid) -> new EntityUpdateGetMessage(uuid);
 }

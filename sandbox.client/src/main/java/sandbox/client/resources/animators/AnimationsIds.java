@@ -5,4 +5,5 @@ public abstract class AnimationsIds {
 	public static Long IDLE = ++increment;
 	public static Long WALK = ++increment;
 	public static Long DEATH = ++increment;
+	public static Long DEAD = ++increment;
 }

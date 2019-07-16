@@ -3,27 +3,22 @@ package sandbox.engine.network;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageFactory;
-import sandbox.engine.network.message.handler.MessageHandler;
+import sandbox.engine.logging.Logger;
+import sandbox.engine.network.message.ProtocolMessage;
+import sandbox.engine.network.message.RawMessage;
 
 public class Connection {
 
 	private final AsynchronousSocketChannel socketChannel;
 	private final ReadHandler readHandler;
 	private final WriteHandler writeHandler;
-	private final MessageFactory messageFactory;
-	private final MessageHandler<Message<?, ?>> messageHandler;
-	private final Runnable onConnectionClosedHandler;
+	private final Consumer<Connection> onConnectionClosedHandler;
 	public String remoteAdress;
 
-	public Connection(AsynchronousSocketChannel socketChannel, MessageFactory messageFactory,
-			MessageHandler<Message<?, ?>> messageHandler, Runnable onConnectionClosedHandler) {
+	public Connection(AsynchronousSocketChannel socketChannel, Consumer<Connection> onConnectionClosedHandler) {
 		this.socketChannel = socketChannel;
-		this.messageFactory = messageFactory;
-		this.messageHandler = messageHandler;
 		this.onConnectionClosedHandler = onConnectionClosedHandler;
 		readHandler = new ReadHandler(this);
 		writeHandler = new WriteHandler(this);
@@ -34,7 +29,7 @@ public class Connection {
 		try {
 			remoteAdress = socketChannel.getRemoteAddress().toString();
 		} catch (IOException e) {
-			System.err.println("Connection::Connection : " + e.toString() + " - " + e.getMessage());
+			Logger.INSTANCE.error("Connection::Connection : " + e.toString() + " - " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			this.remoteAdress = remoteAdress;
@@ -42,20 +37,17 @@ public class Connection {
 		readHandler.read();
 	}
 
-	public void send(Message<?, ?> message) {
+	public void send(RawMessage message) {
 		writeHandler.write(message);
+	}
+
+	public void send(ProtocolMessage message) {
+		writeHandler.write(message.getRawMessage());
+		Logger.INSTANCE.debug("Connection : message sent : {\"type: \"" + message.getRawMessage().getHeader().messageType + ", \"name\"\"" + message.getClass() + "\"}");
 	}
 
 	public boolean isOpen() {
 		return socketChannel.isOpen();
-	}
-
-	public MessageFactory getMessageFactory() {
-		return messageFactory;
-	}
-
-	public MessageHandler<Message<?, ?>> getMessageHandler() {
-		return messageHandler;
 	}
 
 	void write(ByteBuffer peek) {
@@ -66,9 +58,9 @@ public class Connection {
 		if (isOpen()) {
 			try {
 				socketChannel.close();
-				onConnectionClosedHandler.run();
+				onConnectionClosedHandler.accept(this);
 			} catch (IOException e) {
-				System.err.println("Connection::close : " + e.toString() + " - " + e.getMessage());
+				Logger.INSTANCE.error("Connection::close : " + e.toString() + " - " + e.getMessage());
 				e.printStackTrace();
 			}
 		}

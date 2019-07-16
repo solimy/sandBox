@@ -1,23 +1,23 @@
 package sandbox.engine.network;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 
-import sandbox.engine.misc.unsafe.ThrowingRunnable;
+import sandbox.engine.Engine;
 import sandbox.engine.network.message.Header;
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageFactory.UnknonwMessageTypeException;
+import sandbox.engine.network.message.MessageHandler;
+import sandbox.engine.network.message.MessageHandlingService;
+import sandbox.engine.network.message.RawMessage;
 
 public class ReadHandler implements CompletionHandler<Integer, Void> {
-
 	private final Connection connection;
-	public final ByteBuffer buffer = ByteBuffer.allocate(Message.MAX_SIZE);
-	private final Header header = new Header();
+	private Header header = null;
+	public final ByteBuffer buffer = ByteBuffer.allocate(RawMessage.MAX_SIZE);
 
-	public ReadHandler(Connection connection) {
+	public ReadHandler(
+			Connection connection) {
 		this.connection = connection;
-		buffer.limit(Header.getSize());
+		buffer.limit(Header.SIZE);
 	}
 
 	@Override
@@ -27,22 +27,19 @@ public class ReadHandler implements CompletionHandler<Integer, Void> {
 			return;
 		}
 		if (buffer.remaining() == 0) {
-			if (header.getMessageSize() == null) {
+			if (header == null) {
 				buffer.flip();
-				header.read(buffer);
+				header = new Header(buffer);
 				buffer.clear();
-				buffer.limit(header.getMessageSize());
+				buffer.limit(header.messageSize);
 			} else {
-				try {
-					buffer.flip();
-					Message<?, ?> message = connection.getMessageFactory().build(header.getMessageType(), buffer);
-					buffer.clear();
-					buffer.limit(Header.getSize());
-					header.reset();
-					connection.getMessageHandler().handle(connection, message);
-				} catch (UnknonwMessageTypeException e) {
-					e.printStackTrace();
-				}
+				buffer.flip();
+				RawMessage rawMessage = new RawMessage(header, buffer);
+				// TODO : maybe use thread pool for message handling
+				MessageHandlingService.INSTANCE.handle(connection, rawMessage);
+				buffer.clear();
+				buffer.limit(Header.SIZE);
+				header = null;
 			}
 		}
 		read();

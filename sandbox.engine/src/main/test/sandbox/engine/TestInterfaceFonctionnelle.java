@@ -2,6 +2,8 @@ package sandbox.engine;
 
 import java.util.stream.Stream;
 
+import sandbox.engine.logging.Logger;
+
 public class TestInterfaceFonctionnelle {
 
 	public static interface ITest1<A, B, C, D, E> {
@@ -20,11 +22,11 @@ public class TestInterfaceFonctionnelle {
 	public static void main(String[] args) {
 		ITest1<String, Integer, Long, Float, Double> test1 = (i, l, f, d) -> i.toString() + " " + l.toString() + " "
 				+ f.toString() + " " + d.toString();
-		System.out.println("test1 : " + test1.handle(1, 2L, 3F, 4D));
+		Logger.INSTANCE.debug("test1 : " + test1.handle(1, 2L, 3F, 4D));
 
 		ITest2<String, String, ?, ?, ?, ?, ?, ?, ?, ?, ?> test2_1 = (b) -> b;
 
-		ITest3<Integer> test3 = (iT -> System.out.println("test2 : " + Stream.of(iT).reduce((p, c) -> p + c).get()));
+		ITest3<Integer> test3 = (iT -> Logger.INSTANCE.debug("test2 : " + Stream.of(iT).reduce((p, c) -> p + c).get()));
 		test3.handle(1, 2, 3, 4);
 	}
 }

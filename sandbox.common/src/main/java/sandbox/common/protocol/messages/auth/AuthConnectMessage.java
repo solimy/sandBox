@@ -2,29 +2,35 @@ package sandbox.common.protocol.messages.auth;
 
 import java.nio.ByteBuffer;
 
-import sandbox.common.misc.Token;
-import sandbox.common.misc.serializer.TokenSerializer;
-import sandbox.common.protocol.Messages;
-import sandbox.common.protocol.messages.test.TestPingMessage;
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageAllocator;
+import sandbox.engine.logging.Logger;
+import sandbox.engine.misc.Token;
+import sandbox.engine.network.message.Header;
+import sandbox.engine.network.message.ProtocolMessage;
+import sandbox.engine.network.message.RawMessage;
 
-public class AuthConnectMessage extends Message<AuthConnectMessage, Token> {
+public class AuthConnectMessage extends ProtocolMessage {
+	public static final Integer TYPE = AuthConnectMessage.class.getName().hashCode();
 
-	protected AuthConnectMessage(Token token) {
-		super(type, token);
+	public final Token token;
+
+	public AuthConnectMessage(Token token) {
+		super(new RawMessage(TYPE, token));
+		this.token = token;
 	}
 
-	@Override
-	protected ByteBuffer encode() {
-		return TokenSerializer.INSTANCE.encode(attachment);
+
+	public AuthConnectMessage(RawMessage rawMessage) {
+		super(rawMessage);
+		token = (Token) rawMessage.getWord(0);
 	}
 
-	@Override
-	protected void decode(ByteBuffer inputBuffer) {
-		TokenSerializer.INSTANCE.decode(attachment, inputBuffer);
+	public static void main(String[] args) {
+		AuthConnectMessage authConnectMessage = new AuthConnectMessage(new Token());
+		Logger.INSTANCE.debug(authConnectMessage.token);
+		ByteBuffer byteBuffer = authConnectMessage.getRawMessage().getAsByteBuffer();
+		Header header = new Header(byteBuffer);
+		byteBuffer.compact();
+		authConnectMessage = new AuthConnectMessage(new RawMessage(header, byteBuffer));
+		Logger.INSTANCE.debug(authConnectMessage.token);
 	}
-
-	public static final Integer type = AuthConnectMessage.class.getName().hashCode();
-	public static final MessageAllocator<AuthConnectMessage, Token> allocator = (token) -> new AuthConnectMessage(token);
 }

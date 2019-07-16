@@ -30,6 +30,7 @@ public enum GraphicApplication {
 	private final AtomicLong frameRateMillis = new AtomicLong((long) (1000 / 60));
 	private final AtomicBoolean running = new AtomicBoolean(false);
 	private volatile Graphics context = null;
+	public volatile int pixelUnit = 1;
 
 	public final GraphicApplication init(String title, int width, int height) {
         window = new JFrame();
@@ -155,7 +156,7 @@ public enum GraphicApplication {
 	}
 
 	public final void render(Sprite sprite) {
-		sprite.render(context);
+		sprite.render(context, pixelUnit);
 	}
 	
 	public int getWidth() {

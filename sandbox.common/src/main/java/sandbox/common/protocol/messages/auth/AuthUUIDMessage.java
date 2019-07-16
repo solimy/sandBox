@@ -1,28 +1,35 @@
 package sandbox.common.protocol.messages.auth;
 
 import java.nio.ByteBuffer;
-import java.util.UUID;
 
-import sandbox.common.misc.serializer.UUIDSerializer;
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageAllocator;
+import sandbox.engine.logging.Logger;
+import sandbox.engine.misc.UUID;
+import sandbox.engine.network.message.Header;
+import sandbox.engine.network.message.ProtocolMessage;
+import sandbox.engine.network.message.RawMessage;
 
-public class AuthUUIDMessage extends Message<AuthUUIDMessage, UUID> {
+public class AuthUUIDMessage extends ProtocolMessage {
+	public static final Integer TYPE = AuthUUIDMessage.class.getName().hashCode();
 
-	protected AuthUUIDMessage(UUID uuid) {
-		super(type, uuid);
+	public final UUID uuid;
+	
+	public AuthUUIDMessage(UUID uuid) {
+		super(new RawMessage(TYPE, uuid));
+		this.uuid = uuid;
+	}
+	
+	public AuthUUIDMessage(RawMessage rawMessage) {
+		super(rawMessage);
+		this.uuid = (UUID) rawMessage.getWord(0);
 	}
 
-	@Override
-	protected ByteBuffer encode() {
-		return UUIDSerializer.INSTANCE.encode(attachment);
+	public static void main(String[] args) {
+		AuthUUIDMessage authUUIDMessage = new AuthUUIDMessage(new UUID());
+		Logger.INSTANCE.debug(authUUIDMessage.uuid);
+		ByteBuffer byteBuffer = authUUIDMessage.getRawMessage().getAsByteBuffer();
+		Header header = new Header(byteBuffer);
+		byteBuffer.compact();
+		authUUIDMessage = new AuthUUIDMessage(new RawMessage(header, byteBuffer));
+		Logger.INSTANCE.debug(authUUIDMessage.uuid);
 	}
-
-	@Override
-	protected void decode(ByteBuffer inputBuffer) {
-		attachment = UUIDSerializer.INSTANCE.decode(attachment, inputBuffer);
-	}
-
-	public static final Integer type = AuthUUIDMessage.class.getName().hashCode();
-	public static final MessageAllocator<AuthUUIDMessage, UUID> allocator = (uuid) -> new AuthUUIDMessage(uuid);
 }

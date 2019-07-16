@@ -1,30 +1,22 @@
 package sandbox.common.protocol.messages.entity;
 
-import java.nio.ByteBuffer;
-import java.util.UUID;
+import sandbox.engine.game.Event;
+import sandbox.engine.misc.UUID;
+import sandbox.engine.network.message.ProtocolMessage;
+import sandbox.engine.network.message.RawMessage;
 
-import sandbox.common.misc.serializer.UUIDSerializer;
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageAllocator;
+public class EntityDeathMessage extends ProtocolMessage implements Event {
+	public static Integer TYPE = EntityDeathMessage.class.getName().hashCode();
 
-public class EntityDeathMessage extends Message<EntityDeathMessage, UUID> {
-
-	protected EntityDeathMessage(UUID uuid) {
-		super(type, uuid);
+	public final UUID uuid;
+	
+	public EntityDeathMessage(UUID uuid) {
+		super(new RawMessage(TYPE, uuid));
+		this.uuid = uuid;
 	}
 
-	@Override
-	protected ByteBuffer encode() {
-		ByteBuffer uuid = UUIDSerializer.INSTANCE.encode(attachment);
-		uuid.flip();
-		return ByteBuffer.allocate(uuid.remaining()).put(uuid);
+	public EntityDeathMessage(RawMessage rawMessage) {
+		super(rawMessage);
+		uuid = (UUID) rawMessage.getWord(0);
 	}
-
-	@Override
-	protected void decode(ByteBuffer inputBuffer) {
-		attachment = UUIDSerializer.INSTANCE.decode(attachment, inputBuffer);
-	}
-
-	public static Integer type = EntityDeathMessage.class.getName().hashCode();
-	public static MessageAllocator<EntityDeathMessage, UUID> allocator = (uuid) -> new EntityDeathMessage(uuid);
 }

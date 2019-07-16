@@ -1,7 +1,7 @@
 package sandbox.common.world.model;
 
 import java.util.Map;
-import java.util.UUID;
+import sandbox.engine.misc.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import sandbox.common.game.components.WorldEntityComponent;

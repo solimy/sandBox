@@ -14,6 +14,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.SAXException;
 
+import sandbox.engine.logging.Logger;
 import sandbox.engine.settings.Settings;
 
 public enum Engine {
@@ -91,10 +92,10 @@ public enum Engine {
 		}
 		this.numberOfThreads = numberOfThreads;
 		this.cadenceMillis = cadenceMillis;
-		System.out.println("Engine settings : {");
-		System.out.println("    number of threads : " + this.numberOfThreads);
-		System.out.println("    cadence (milliseconds) : " + this.cadenceMillis);
-		System.out.println("}");
+		Logger.INSTANCE.debug("Engine settings : {");
+		Logger.INSTANCE.debug("    number of threads : " + this.numberOfThreads);
+		Logger.INSTANCE.debug("    cadence (milliseconds) : " + this.cadenceMillis);
+		Logger.INSTANCE.debug("}");
 		scheduler = Executors.newScheduledThreadPool(this.numberOfThreads);
 	}
 

@@ -34,11 +34,7 @@ public class Animator2D {
 
 	public void play(Long animationId, Boolean loop) {
 		this.loop = loop;
-		Map<Orientation, Animation> newAnimation = animations.get(animationId);
-		if (newAnimation == null) {
-			return;
-		}
-		currentAnimation = newAnimation;
+		currentAnimation = animations.get(animationId);
 		currentAnimationId = animationId;
 		startTime = Engine.Clock.INSTANCE.getCurrentTimeMillis();
 	}
@@ -48,14 +44,17 @@ public class Animator2D {
 	}
 
 	public Sprite getFrame(CardinalOrientation orientation) {
-		if (currentAnimation == null)
+		if (currentAnimation == null) {
 			return Sprite.empty;
+		}
 		Animation animation = currentAnimation.get(orientation);
-		if (animation == null)
+		if (animation == null) {
 			return Sprite.empty;
+		}
 		long ellapsedMillis = Engine.Clock.INSTANCE.getCurrentTimeMillis() - startTime;
-		if (ellapsedMillis > animation.getTotalDuration() && !loop) {
-			play(animationSequence.getOrDefault(currentAnimationId, currentAnimationId), loop);
+		if (ellapsedMillis >= animation.getTotalDuration() && !loop) {
+			play(animationSequence.get(currentAnimationId), false);
+			return getFrame(orientation);
 		}
 		return animation.getFrame(ellapsedMillis);
 	}

@@ -1,5 +1,7 @@
 package sandbox.engine.misc.unsafe;
 
+import sandbox.engine.logging.Logger;
+
 @FunctionalInterface
 public interface ThrowingRunnable extends Runnable {
 	@Override
@@ -7,7 +9,7 @@ public interface ThrowingRunnable extends Runnable {
 		try {
 			tryRun();
 		} catch (final Throwable t) {
-			System.err.println("ThrowingRunnable::run : " + t.toString() + " - " + t.getMessage());
+			Logger.INSTANCE.error("ThrowingRunnable::run : " + t.toString() + " - " + t.getMessage());
 			t.printStackTrace();
 		}
 	}

@@ -2,20 +2,26 @@ package sandbox.server.game.components;
 
 import java.lang.ref.WeakReference;
 
+import sandbox.common.game.components.WorldEntityComponent;
 import sandbox.common.game.events.Damage;
 import sandbox.common.game.events.Events;
 import sandbox.common.game.events.Move;
 import sandbox.common.math.position.Coordinates;
 import sandbox.common.math.position.Position;
-import sandbox.common.protocol.Messages;
+import sandbox.common.protocol.messages.entity.EntityDamagedMessage;
+import sandbox.common.protocol.messages.entity.EntityDeathMessage;
+import sandbox.common.protocol.messages.entity.EntityMoveMessage;
+import sandbox.common.protocol.messages.entity.EntityRemoveMessage;
+import sandbox.common.protocol.messages.entity.EntityUpdateMessage;
 import sandbox.common.world.Constraints;
 import sandbox.common.world.elements.entity.state.EntityState;
 import sandbox.engine.Engine;
 import sandbox.engine.game.Component;
 import sandbox.engine.game.Entity;
 import sandbox.engine.game.Event;
+import sandbox.engine.logging.Logger;
 import sandbox.engine.math.Vector2D;
-import sandbox.engine.network.message.Message;
+import sandbox.engine.misc.UUID;
 import sandbox.engine.state.TimedStateManager;
 import sandbox.server.game.GameServer;
 
@@ -35,8 +41,11 @@ public class ServerEntityComponent implements Component {
 	public void onCreate(Entity attachedEntity) {
 		Position position = this.positionRef.get();
 		if (position != null) {
+			UUID uuid = attachedEntity.getUUID();
+			WorldEntityComponent worldEntityComponent = (WorldEntityComponent) attachedEntity.getComponent(WorldEntityComponent.ID);
+			String entityName = attachedEntity.getName();
 			GameServer.INSTANCE.broadcast(position.coordinates, Constraints.BROADCAST_RANGE,
-					Messages.ENTITY_UPDATE.build(attachedEntity));
+					new EntityUpdateMessage(uuid, worldEntityComponent, entityName));
 		}
 	}
 
@@ -45,7 +54,7 @@ public class ServerEntityComponent implements Component {
 		Position position = this.positionRef.get();
 		if (position != null) {
 			GameServer.INSTANCE.broadcast(position.coordinates, Constraints.BROADCAST_RANGE,
-					Messages.ENTITY_REMOVE.build(attachedEntity.getUUID()));
+					new EntityRemoveMessage(attachedEntity.getUUID()));
 		}
 	}
 
@@ -86,7 +95,7 @@ public class ServerEntityComponent implements Component {
 		if (stateManager != null && position != null) {
 			stateManager.setState(EntityState.DEAD);
 			GameServer.INSTANCE.broadcast(position.coordinates, Constraints.BROADCAST_RANGE,
-					Messages.ENTITY_DEATH.build(attachedEntity.getUUID()));
+					new EntityDeathMessage(attachedEntity.getUUID()));
 		}
 	}
 
@@ -94,7 +103,7 @@ public class ServerEntityComponent implements Component {
 		Position position = this.positionRef.get();
 		if (position != null) {
 			GameServer.INSTANCE.broadcast(position.coordinates, Constraints.BROADCAST_RANGE,
-					Messages.DAMAGE_NOTIFICATION.build(damage));
+					new EntityDamagedMessage(attachedEntity.getUUID(), damage));
 		}
 	}
 
@@ -117,8 +126,8 @@ public class ServerEntityComponent implements Component {
 		default:
 			break;
 		}
-		GameServer.INSTANCE.broadcast(NW, SE, Messages.ENTITY_MOVE.build(move));
-		System.out.println(Engine.Clock.INSTANCE.getCurrentTimeMillis() + " : sending movement ");
+		GameServer.INSTANCE.broadcast(NW, SE, new EntityMoveMessage(move));
+		Logger.INSTANCE.debug("ServerEntityComponent.onEventMove : movement broadcast");
 	}
 	
 	private void onEventDespawn(Entity attachedEntity, Events depsawn) {

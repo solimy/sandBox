@@ -6,7 +6,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import sandbox.engine.network.message.Message;
+import sandbox.engine.network.message.RawMessage;
 
 public class WriteHandler implements CompletionHandler<Integer, Void> {
 
@@ -37,8 +37,8 @@ public class WriteHandler implements CompletionHandler<Integer, Void> {
 		connection.close();
 	}
 
-	public void write(Message<?, ?> message) {
-		ByteBuffer buffer = message.getBuffer();
+	public void write(RawMessage message) {
+		ByteBuffer buffer = message.getAsByteBuffer();
 		messagesToSend.add(buffer);
 		write();
 	}

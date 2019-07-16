@@ -1,11 +1,12 @@
 package sandbox.engine.game;
 
+
 /**
  * Functionnal interface o/
  * 
  * this will actually work :
  * 
- * Script script = (entity) -> System.out.println(entity.toString());
+ * Script script = (entity) -> Logger.INSTANCE.debug(entity.toString());
  * 
  * @author daures_h
  *

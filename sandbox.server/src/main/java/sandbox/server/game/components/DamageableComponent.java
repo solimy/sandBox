@@ -5,13 +5,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import sandbox.common.game.events.Damage;
 import sandbox.common.game.events.Events;
-import sandbox.common.math.position.Coordinates;
-import sandbox.common.protocol.Messages;
-import sandbox.common.world.Constraints;
 import sandbox.engine.game.Component;
 import sandbox.engine.game.Entity;
 import sandbox.engine.game.Event;
-import sandbox.server.game.GameServer;
 
 class DamageableComponent implements Component {
 	public static final String ID = "DamageableComponent";

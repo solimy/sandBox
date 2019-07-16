@@ -1,28 +1,21 @@
 package sandbox.common.protocol.messages.chunk;
 
-import java.nio.ByteBuffer;
-
-import sandbox.common.misc.serializer.ChunkTerrainSerializer;
 import sandbox.common.world.model.Chunk;
-import sandbox.engine.network.message.Message;
-import sandbox.engine.network.message.MessageAllocator;
+import sandbox.engine.network.message.ProtocolMessage;
+import sandbox.engine.network.message.RawMessage;
 
-public class ChunkTerrainMessage extends Message<ChunkTerrainMessage, Chunk> {
-
-	protected ChunkTerrainMessage(Chunk chunk) {
-		super(type, chunk);
+public class ChunkTerrainMessage extends ProtocolMessage {
+	public static final Integer TYPE = ChunkTerrainMessage.class.getName().hashCode();
+	public final Chunk chunk;
+	
+	public ChunkTerrainMessage(Chunk chunk) {
+		super(new RawMessage(TYPE, chunk));
+		this.chunk = chunk;
 	}
 
-	@Override
-	protected ByteBuffer encode() {
-		return ChunkTerrainSerializer.INSTAnCE.encode(attachment);
+	
+	public ChunkTerrainMessage(RawMessage rawMessage) {
+		super(rawMessage);
+		this.chunk = (Chunk) rawMessage.getWord(0);
 	}
-
-	@Override
-	protected void decode(ByteBuffer inputBuffer) {
-		attachment = ChunkTerrainSerializer.INSTAnCE.decode(attachment, inputBuffer);
-	}
-
-	public static final Integer type = ChunkTerrainMessage.class.getName().hashCode();
-	public static final MessageAllocator<ChunkTerrainMessage, Chunk> allocator = (chunk) -> new ChunkTerrainMessage(chunk);
 }

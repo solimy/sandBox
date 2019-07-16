@@ -3,13 +3,14 @@ package sandbox.common.world.model;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import sandbox.engine.misc.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import sandbox.common.game.components.WorldEntityComponent;
 import sandbox.common.math.position.Coordinates;
 import sandbox.engine.game.Entity;
 import sandbox.engine.game.Spawner;
+import sandbox.engine.logging.Logger;
 import sandbox.engine.math.CardinalOrientation;
 
 public enum World {
@@ -214,7 +215,7 @@ public enum World {
 			askStateManagerBeforeMove = value;
 		}
 		public Entity spawn(Spawner spawner) {
-			Entity entity = spawner.spawn(UUID.randomUUID());
+			Entity entity = spawner.spawn(new UUID());
 			put(((WorldEntityComponent)entity.getComponent(WorldEntityComponent.ID)).getPosition().get().coordinates, entity, true);
 			return entity;
 		}
@@ -224,6 +225,7 @@ public enum World {
 		}
 
 		public void removeEntity(UUID uuid) {
+			Logger.INSTANCE.debug("World : removing " + uuid);
 			Entity entity = dynamicEntities.get(uuid);
 			dynamicEntities.remove(uuid);
 			if (entity != null) {
@@ -236,6 +238,7 @@ public enum World {
 									.getDynamicEntities().remove(entity.getUUID());
 				}
 			}
+			Logger.INSTANCE.debug("World : removed entity " + uuid);
 		}
 
 		public void removeEntity(Entity entity) {
@@ -243,6 +246,7 @@ public enum World {
 		}
 
 		public void put(Coordinates coordinates, Entity entity, Boolean createChunkIfNotPresent) {
+			Logger.INSTANCE.debug("World : putting entity " + entity.getUUID());
 			if ((!createChunkIfNotPresent && getNullCell(coordinates) == null) || !getCell(coordinates).isWalkable)
 				return;
 			Entity existingEntity = get(entity.getUUID());
@@ -257,6 +261,7 @@ public enum World {
 			chunk.cells[wes.getPosition().get().coordinates
 					.getInChunkY()][wes.getPosition().get().coordinates.getInChunkX()]
 							.getDynamicEntities().put(existingEntity.getUUID(), existingEntity);
+			Logger.INSTANCE.debug("World : put entity " + entity.getUUID());
 		}
 
 		public Entity move(CardinalOrientation move, Entity entity) {

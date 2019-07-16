@@ -1,13 +1,12 @@
 package sandbox.server.game.items;
 
-import java.util.UUID;
-
 import sandbox.common.game.components.WorldEntityComponent;
 import sandbox.common.world.enums.EntityNature;
 import sandbox.engine.Engine;
 import sandbox.engine.game.Component;
 import sandbox.engine.game.Entity;
 import sandbox.engine.game.Event;
+import sandbox.engine.misc.UUID;
 import sandbox.engine.misc.time.Timer;
 import sandbox.server.game.components.ServerEntityComponent;
 import sandbox.server.game.components.ai.LinearProjectileScript;
@@ -46,7 +45,7 @@ public class FireballItem implements Component {
 		WorldEntityComponent wec = new WorldEntityComponent(
 				((WorldEntityComponent) user.getComponent(WorldEntityComponent.ID)).getPosition().get().copy().moveForward(1),
 				EntityNature.FIREBALL);
-		Entity fireball = new Entity(UUID.randomUUID(), wec, new ServerEntityComponent(wec.getStateManager(), wec.getPosition()),
+		Entity fireball = new Entity(new UUID(), wec, new ServerEntityComponent(wec.getStateManager(), wec.getPosition()),
 				new LinearProjectileScript(user.getUUID(), 10000L, 8L, 10, wec.getStateManager(), wec.getPosition()));
 	}
 
