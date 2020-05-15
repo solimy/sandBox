@@ -1,31 +1,33 @@
 ## TODO
 
+# QUICK NOTES
+ground -> layer 0
+chars -> layer 1
+particles -> layer 2
+
 # IN PROGRESS
--move as much network code as possible in the engine
--fix: dead players not seen as dead when creating a new client
 
 
-# ALL
--handle inventory and equipment
--add option to send your own sprites for your character
--embed server in client
--Implement Camera in Engine (as a compoenent ?)
-    -Better render, via renderList.
-    -Make have a renderable component (to replace GraphicEntityComponent in the client)
--think about WeakReferences relevancy in components
--rework orientation withe dregree. (NORTH[90[45-135]], WEST[180[135-225]], SOUTH[270[225-315]], EAST[0:360[315-45]])
+# FIX
+- fix: dead players not seen as dead when creating a new client
 
+# REFACTO
+- refacto: Change the way world data and entities are stored and positionned
+- refacto: reimplement the component model using Data Oriented Programming
+- refacto: re-think the way graphic ressources are handled (use a hash-map of key:sprite ? move the sprites definitions in a json file ?)
+- refacto: rework orientation withe dregree. (NORTH[90[45-135]], WEST[180[135-225]], SOUTH[270[225-315]], EAST[0:360[315-45]])
+- refacto: think about WeakReferences relevancy in components
+- refacto: Implement Camera in Engine (as a compoenent ?)
+    - Better render, via renderList.
+    - Make have a renderable component (to replace GraphicEntityComponent in the client)
+- refacto: improve the RawMessage and data serialization with less realloc to make it faster
 
-# ENGINE
+# FEAT
+- feat: add life bars in ui
+- feat: handle inventory and equipment
+- feat: add more animations
+- feat: add more AI
+- feat: add menu to configure server settings or connect to existing server
+- feat: embed server in client
+- feat: add option to send your own sprites for your character
 
-
-# COMMON
-
-# SERVER
--add more AI
-
-# CLIENT
--add more animations
--add life bars in ui
--add menu to configure server settings or connect to existing server
--re-think the way graphic ressources are handled (use a hash-map of key:sprite ? move the sprites definitions in a json file ?)
