@@ -83,10 +83,14 @@ public enum Engine {
 			SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
 			Settings settings = new Settings();
 			parser.parse(ClassLoader.getSystemResourceAsStream("engine.settings.xml"), settings);
-			numberOfThreads = Optional.ofNullable(settings.get("numberOfThreads")).map(setting -> new Integer(setting))
-					.orElse(10);
-			cadenceMillis = Optional.ofNullable(settings.get("cadenceMillis")).map(setting -> new Integer(setting))
-					.orElse(100);
+			numberOfThreads = Optional
+				.ofNullable(settings.get("numberOfThreads"))
+				.map(setting -> Integer.parseInt(setting))
+				.orElse(10);
+			cadenceMillis = Optional
+				.ofNullable(settings.get("cadenceMillis"))
+				.map(setting -> Integer.parseInt(setting))
+				.orElse(100);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();
 		}
@@ -101,5 +105,9 @@ public enum Engine {
 
 	public void scheduleWithFixedDelay(Runnable command, int initialDelay, Integer delay, TimeUnit unit) {
 		scheduler.scheduleWithFixedDelay(command, initialDelay, delay, unit);
+	}
+
+	public void schedule(Runnable command) {
+		scheduler.execute(command);
 	}
 }

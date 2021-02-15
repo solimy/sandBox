@@ -3,6 +3,7 @@ package sandbox.engine.network.message;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import sandbox.engine.Engine;
 import sandbox.engine.logging.Logger;
 import sandbox.engine.network.Connection;
 
@@ -19,6 +20,9 @@ public enum MessageHandlingService {
 		Integer type = rawMessage.getHeader().messageType;
 		MessageHandler messageHandler = messageHandlers.get(type);
 		Logger.INSTANCE.debug("MessageHandlingService.handle : {\"type\": " + type + ", \"name\": " + (messageHandler != null ? messageHandler.getClass().getSimpleName() : null) + "}");
-		messageHandler.handle(connection, rawMessage);
+		Engine.INSTANCE.schedule(() -> {
+			messageHandler.handle(connection, rawMessage);
+			Logger.INSTANCE.debug("MessageHandlingService.handle : handled : {\"type\": " + type + ", \"name\": " + (messageHandler != null ? messageHandler.getClass().getSimpleName() : null) + "}");
+		});
 	}
 }
