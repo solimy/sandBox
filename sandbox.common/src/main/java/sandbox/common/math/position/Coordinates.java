@@ -91,13 +91,17 @@ public class Coordinates implements Copyable<Coordinates>, Serializable {
 	}
 
 	public Coordinates modChunkCoordinates(Vector2D modifierChunk, Vector2D modifierInChunk) {
-		if (modifierChunk != null) {
-			this.chunkX += modifierChunk.x;
-			this.chunkY += modifierChunk.y;
-		}
 		if (modifierInChunk != null) {
 			this.inChunkX += modifierInChunk.x;
 			this.inChunkY += modifierInChunk.y;
+		}
+		return modChunkCoordinates(modifierChunk);
+	}
+
+	public Coordinates modChunkCoordinates(Vector2D modifierChunk) {
+		if (modifierChunk != null) {
+			this.chunkX += modifierChunk.x;
+			this.chunkY += modifierChunk.y;
 		}
 		this.worldX = ((chunkX) * subLayerWidth) + inChunkX;
 		this.worldY = ((chunkY) * subLayerLength) + inChunkY;
