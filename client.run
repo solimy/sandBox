@@ -1,0 +1,3 @@
+LOGLEVEL=DEBUG \
+LOGFILE="logs/sandbox.client.$(date +'%m-%d-%Y %H:%M:%S').log" \
+java -jar sandbox.client/build/libs/SandBox-Client-0.0.2.jar
