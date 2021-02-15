@@ -95,23 +95,30 @@ public enum GameServer {
 	}
 
 	private void initServerUpdate() {
-		Engine.INSTANCE.scheduleWithFixedDelay(GameServer.INSTANCE::updateRoutine, 0, Engine.INSTANCE.cadenceMillis,
-				TimeUnit.MILLISECONDS);
+		Engine.INSTANCE.scheduleWithFixedDelay(
+			GameServer.INSTANCE::updateRoutine,
+			0,
+			Engine.INSTANCE.cadenceMillis,
+			TimeUnit.MILLISECONDS
+		);
 	}
 
 	private void updateRoutine() {
 		try {
 			Long currentTimeMillis = Engine.Clock.INSTANCE.getCurrentTimeMillis();
-			players.values().parallelStream().forEach(player -> {
-				WorldEntityComponent wec = (WorldEntityComponent) player.getComponent(WorldEntityComponent.ID);
-				if (wec != null) {
-					Vector2D mod = new Vector2D();
-					for (mod.y = -Constraints.VIEW_RANGE; mod.y <= Constraints.VIEW_RANGE; ++mod.y) {
-						for (mod.x = -Constraints.VIEW_RANGE; mod.x <= Constraints.VIEW_RANGE; ++mod.x) {
-							World.INSTANCE.getChunk(
-									new Coordinates(wec.getPosition().get().coordinates).modChunkCoordinates(mod, null))
-							.update(currentTimeMillis);
-						}
+			players
+			.values()
+			.stream()
+			.map(player -> (WorldEntityComponent) player.getComponent(WorldEntityComponent.ID))
+			.map(wec -> wec.getPosition().get().coordinates)
+			.distinct()
+			.forEach(coordinates -> {
+				Vector2D mod = new Vector2D();
+				for (mod.y = -Constraints.VIEW_RANGE; mod.y <= Constraints.VIEW_RANGE; ++mod.y) {
+					for (mod.x = -Constraints.VIEW_RANGE; mod.x <= Constraints.VIEW_RANGE; ++mod.x) {
+						World.INSTANCE.getChunk(
+							new Coordinates(coordinates).modChunkCoordinates(mod)
+						).update(currentTimeMillis);
 					}
 				}
 			});
